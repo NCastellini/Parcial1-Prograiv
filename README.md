@@ -5,12 +5,12 @@
 
 ---
 
-##  Integrantes del Grupo (Grupo 8)
-* **Castellini, Nicolás Roberto** - Legajo: `XXXXX`
-* **Apellido, Nombre** - Legajo: `XXXXX`
-* **Apellido, Nombre** - Legajo: `XXXXX`
-* **Apellido, Nombre** - Legajo: `XXXXX`
-* **Apellido, Nombre** - Legajo: `XXXXX`
+## 👥 Integrantes del Grupo (Grupo 04)
+* **Castellini, Nicolás**
+* **Oela, Ramiro**
+* **Peralta, Julián**
+* **Ramos, Nikolás**
+* **Strizzi, Román**
 
 ---
 
