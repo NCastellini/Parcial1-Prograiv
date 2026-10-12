@@ -5,7 +5,7 @@
 
 ---
 
-## 👥 Integrantes del Grupo (Grupo 04)
+##  Integrantes del Grupo (Grupo 04)
 * **Castellini, Nicolás**
 * **Oela, Ramiro**
 * **Peralta, Julián**
