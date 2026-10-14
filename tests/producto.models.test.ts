@@ -1,8 +1,8 @@
 // tests/producto.test.ts
 import { describe, test, expect } from 'vitest';
-import { Expreso } from '../src/models/Expreso';
-import { Filtrado } from '../src/models/Filtrado';
-import { Pasteleria } from '../src/models/Pasteleria';
+import { Expreso } from '../src/models/Expreso.js';
+import { Filtrado } from '../src/models/Filtrado.js';
+import { Pasteleria } from '../src/models/Pasteleria.js';
 
 describe('Módulo de Productos y Precios - Integrante 1', () => {
 
