@@ -35,3 +35,54 @@ describe('GET /pedidos', () => {
   });
 
 });
+
+// GET /pedidos/:id
+describe('GET /pedidos/:id', () => {
+
+  test('responde 404 cuando el pedido no existe', async () => {
+    const res = await request(app).get('/pedidos/1');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  test('responde 200 y devuelve el pedido correcto', async () => {
+    pedidos.push({
+      id: 42,
+      items: [{ productoId: 7, cantidad: 1, precioUnitario: 2500 }],
+      estado: 'completado',
+      total: 2500,
+    });
+
+    const res = await request(app).get('/pedidos/42');
+
+    expect(res.status).toBe(200);
+    expect(res.body.id).toBe(42);
+    expect(res.body.total).toBe(2500);
+  });
+
+  test('responde 400 si el id no es un número', async () => {
+    const res = await request(app).get('/pedidos/xyz');
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  test('el pedido devuelto tiene id, items, estado y total', async () => {
+    pedidos.push({
+      id: 5,
+      items: [{ productoId: 2, cantidad: 3, precioUnitario: 7420 }],
+      estado: 'pendiente',
+      total: 22260,
+    });
+
+    const res = await request(app).get('/pedidos/5');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('id');
+    expect(res.body).toHaveProperty('items');
+    expect(res.body).toHaveProperty('estado');
+    expect(res.body).toHaveProperty('total');
+  });
+
+});
