@@ -1,5 +1,3 @@
-// src/data/preciosData.ts
-
 export type VariedadCafe = 'Brasil' | 'Colombia' | 'Etiopía';
 export type TamanioCafe = 'Pocillo' | 'Mediano' | 'Taza grande';
 export type NombrePasteleria = 'Muffins de chocolate' | 'Torta selva negra';
