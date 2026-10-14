@@ -1,4 +1,5 @@
-
+// tests/producto.test.ts
+import { describe, test, expect } from 'vitest';
 import { Expreso } from '../src/models/Expreso';
 import { Filtrado } from '../src/models/Filtrado';
 import { Pasteleria } from '../src/models/Pasteleria';
