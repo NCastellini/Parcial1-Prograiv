@@ -5,11 +5,13 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "test": "vitest"
-  },
+  "dev": "tsx watch src/index.ts",
+  "build": "tsc",
+  "start": "node dist/index.js",
+  "test": "vitest",
+  "test:ui": "vitest --ui",
+  "test:run": "vitest run"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NCastellini/Parcial1-Prograiv.git"
@@ -31,6 +33,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.5",
     "@types/supertest": "^7.2.1",
+    "@vitest/ui": "^5.0.4",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
