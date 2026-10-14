@@ -7,3 +7,22 @@ export const pedidosRouter = Router();
 pedidosRouter.get('/', (_req: Request, res: Response) => {
   res.status(200).json(pedidos);
 });
+
+// GET /pedidos/:id te devuelve un pedido por su id
+pedidosRouter.get('/:id', (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    res.status(400).json({ error: 'El id debe ser un número' });
+    return;
+  }
+
+  const pedido = pedidos.find((p) => p.id === id);
+
+  if (!pedido) {
+    res.status(404).json({ error: 'Pedido no encontrado' });
+    return;
+  }
+
+  res.status(200).json(pedido);
+});
