@@ -12,6 +12,3 @@ export interface Pedido {
   estado: EstadoPedido;
   total: number;
 }
-
-// arreglo que se comparte entre todos los módulos
-export const pedidos: Pedido[] = [];
