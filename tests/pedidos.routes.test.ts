@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '../src/app.js';
-import { pedidos } from '../src/data/pedidosCafe.js';
+import { pedidos } from '../src/services/pedidos.service.js';
 
 // limpia los pedidos antes de cada test para evitar interferencias
 beforeEach(() => {
