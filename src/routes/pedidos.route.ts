@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { pedidos } from '../data/pedidosCafe.js';
+import { pedidos } from '../services/pedidos.service.js';
 
 export const pedidosRouter = Router();
 
