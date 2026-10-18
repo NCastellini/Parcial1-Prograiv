@@ -1,10 +1,9 @@
 import { CantidadesVendidas, ProductoMasVendidoResultado, ReporteGeneral } from '../models/Reporte.js';
-// O si tu proyecto no usa extensión .js en imports, déjalo como '../models/Reporte' según el resto de los archivos de tus compañeros.
 
 export class ReportesService {
 
   /**
-   * 1. Calcular la facturación total sumando los totales de todos los pedidos
+    Calcular la facturación total sumando los totales de todos los pedidos
    */
   public static calcularFacturacionTotal(pedidos: any[]): number {
     if (!pedidos || pedidos.length === 0) return 0;
@@ -12,7 +11,7 @@ export class ReportesService {
   }
 
   /**
-   * 2. Calcular las cantidades vendidas por producto
+   * Calcular las cantidades vendidas por producto
    */
   public static calcularCantidadesVendidas(pedidos: any[]): CantidadesVendidas {
     const ventas: CantidadesVendidas = {};
@@ -34,7 +33,7 @@ export class ReportesService {
   }
 
   /**
-   * 3. Determinar el producto más vendido (Maneja casos sin pedidos y empates)
+   * Determinar el producto más vendido (Maneja casos sin pedidos y empates)
    */
   public static obtenerProductoMasVendido(pedidos: any[]): ProductoMasVendidoResultado {
     const ventas = this.calcularCantidadesVendidas(pedidos);
