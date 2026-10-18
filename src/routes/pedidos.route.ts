@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { pedidos } from '../services/pedidos.service.js';
+import { crearPedido, ItemEntrada, pedidos } from '../services/pedidos.service.js';
 
 export const pedidosRouter = Router();
 
@@ -26,3 +26,16 @@ pedidosRouter.get('/:id', (req: Request, res: Response) => {
 
   res.status(200).json(pedido);
 });
+
+// POST /pedidos - Crea un nuevo pedido
+pedidosRouter.post('/', (req: Request, res: Response) => {
+  try {
+    const entrada: ItemEntrada[] = req.body;
+
+    const nuevoPedido = crearPedido(entrada);
+
+    res.status(201).json(nuevoPedido);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+})
