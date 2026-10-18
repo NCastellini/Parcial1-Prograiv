@@ -86,3 +86,51 @@ describe('GET /pedidos/:id', () => {
   });
 
 });
+
+// POST /pedidos
+describe('POST /pedidos', () => {
+
+  test('responde 201 y crea un pedido exitosamente', async () => {
+    const nuevoPedido = [
+      { productoId: 1, cantidad: 2 }
+    ];
+
+    const res = await request(app)
+      .post('/pedidos')
+      .send(nuevoPedido);
+
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('id');
+    expect(res.body.estado).toBe('pendiente');
+    expect(res.body.items).toHaveLength(1);
+    expect(res.body.total).toBe(10040); // 5020 * 2
+  });
+
+  test('responde 400 si el array de items esta vacio', async () => {
+    const res = await request(app)
+      .post('/pedidos')
+      .send([]);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  test('responde 400 si se envia un producto que no existe', async () => {
+    const res = await request(app)
+      .post('/pedidos')
+      .send([{ productoId: 9999, cantidad: 1 }]);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  test('responde 400 si la cantidad es invalida (cero o negativa)', async () => {
+    const res = await request(app)
+      .post('/pedidos')
+      .send([{ productoId: 1, cantidad: 0 }]);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+  });
+
+});
