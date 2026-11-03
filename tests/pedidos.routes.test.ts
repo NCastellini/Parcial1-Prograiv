@@ -76,7 +76,7 @@ describe('GET /pedidos/:id', () => {
         { productoId: 1, cantidad: 1, precioUnitario: 5020 },
       ],
       estado: 'pendiente' as const,
-      total: 22260,
+      total: 27280,
     });
     pedidos.push(pedido);
 
