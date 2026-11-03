@@ -14,3 +14,18 @@ export const productos: Producto[] = [
   new Pasteleria(7, 'Muffins de chocolate'),
   new Pasteleria(8, 'Torta selva negra'),
 ];
+
+// Función para crear una lista con productos de prueba
+export const productosTest: Producto[] = crearProductosDePrueba();
+export function crearProductosDePrueba(): Producto[] {
+  return [  
+    new Expreso(1, 'Brasil', 'Pocillo'),
+    new Expreso(2, 'Colombia', 'Mediano'),
+    new Expreso(3, 'Etiopía', 'Taza grande'),
+    new Filtrado(4, 'Brasil', 'Pocillo'),
+    new Filtrado(5, 'Colombia', 'Mediano'),
+    new Filtrado(6, 'Etiopía', 'Taza grande'),
+    new Pasteleria(7, 'Muffins de chocolate'),
+    new Pasteleria(8, 'Torta selva negra'),
+  ];
+}
