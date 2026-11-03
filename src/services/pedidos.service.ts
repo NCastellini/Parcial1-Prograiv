@@ -1,5 +1,7 @@
 import type { Pedido, ItemPedido } from '../data/pedidosCafe.js';
 import { obtenerProducto } from './productos.service.js';
+import { ErrorHttp } from '../errors.js';
+import { mesas } from '../data/mesas.js';
 
 // Modelo reducido de los productos para agregarlos a los pedidos.
 export interface ItemEntrada {
@@ -18,8 +20,12 @@ export function calcularTotal(items: ItemPedido[]): number {
 
 export function crearPedido(entrada: ItemEntrada[], mesaID?: number): Pedido {
     if (!Array.isArray(entrada) || entrada.length === 0) {
-        throw new Error('El pedido debe tener al menos un item'); // Caso de error: El pedido está vacío.
+        throw new ErrorHttp(400, 'El pedido debe tener al menos un item'); // Caso de error: El pedido está vacío.
     }
+
+    if (mesaID !== undefined && !mesas.some((m) => m.id === mesaID)) {
+        throw new ErrorHttp(400, `La mesa ${mesaID} no existe`);
+}
 
     const items: ItemPedido[] = entrada.map(({ productoId, cantidad }) => {
         if (!Number.isInteger(cantidad) || cantidad <= 0) {
