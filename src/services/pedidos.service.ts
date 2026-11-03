@@ -25,7 +25,7 @@ export function crearPedido(entrada: ItemEntrada[], mesaID?: number): Pedido {
 
     if (mesaID !== undefined && !mesas.some((m) => m.id === mesaID)) {
         throw new ErrorHttp(400, `La mesa ${mesaID} no existe`);
-}
+    }
 
     const items: ItemPedido[] = entrada.map(({ productoId, cantidad }) => {
         if (!Number.isInteger(cantidad) || cantidad <= 0) {
@@ -33,7 +33,7 @@ export function crearPedido(entrada: ItemEntrada[], mesaID?: number): Pedido {
         }
         const producto = obtenerProducto(productoId);
         if (!producto) {
-            throw new Error(`El producto ${productoId} no existe`); // Caso de error: Se selecciona un item con id inválido.
+            throw new ErrorHttp(404, `El producto ${productoId} no existe`); // Caso de error: Se selecciona un item con id inválido.
         }
         return { productoId, cantidad, precioUnitario: producto.calcularPrecio() };
     });
