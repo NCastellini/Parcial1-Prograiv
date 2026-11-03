@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { crearPedido, ItemEntrada, pedidos } from '../services/pedidos.service.js';
+import { ErrorHttp } from '../errors.js';
 
 export const pedidosRouter = Router();
 
@@ -33,13 +34,11 @@ pedidosRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
     const { items, mesaID } = req.body ?? {};
 
     if (!Array.isArray(items)) {
-      res.status(400).json({ error: 'items debe ser un array' });
-      return;
+      throw new ErrorHttp(400, 'items debe ser un array');
     }
 
     if (mesaID !== undefined && (typeof mesaID !== 'number' || !Number.isInteger(mesaID) || mesaID <= 0)) {
-      res.status(400).json({ error: 'mesaID debe ser un número entero positivo' });
-      return;
+      throw new ErrorHttp(400, 'mesaID debe ser un número entero positivo');
     }
 
     const nuevoPedido = crearPedido(items as ItemEntrada[], mesaID);

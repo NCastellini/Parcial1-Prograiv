@@ -29,7 +29,7 @@ export function crearPedido(entrada: ItemEntrada[], mesaID?: number): Pedido {
 
     const items: ItemPedido[] = entrada.map(({ productoId, cantidad }) => {
         if (!Number.isInteger(cantidad) || cantidad <= 0) {
-            throw new Error(`Cantidad inválida para el producto ${productoId}`); // Caso de error: Se selecciona una cantidad inválida del producto.
+            throw new ErrorHttp(400, `Cantidad inválida para el producto ${productoId}`); // Caso de error: Se selecciona una cantidad inválida del producto.
         }
         const producto = obtenerProducto(productoId);
         if (!producto) {
