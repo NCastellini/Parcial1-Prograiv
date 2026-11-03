@@ -12,13 +12,14 @@ describe('GET /productos', () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-  test('cada producto tiene id, nombre y precio', async () => {
+  test('cada producto tiene id, nombre, precio y tipo', async () => {
     const res = await request(app).get('/productos');
 
     for (const producto of res.body) {
       expect(producto).toHaveProperty('id');
       expect(producto).toHaveProperty('nombre');
       expect(producto).toHaveProperty('precio');
+      expect(producto).toHaveProperty('tipo');
     }
   });
 
@@ -28,6 +29,15 @@ describe('GET /productos', () => {
     for (const producto of res.body) {
       expect(typeof producto.precio).toBe('number');
       expect(producto.precio).toBeGreaterThan(0);
+    }
+  });
+
+  test('el tipo de cada producto es un string no vacío', async () => {
+    const res = await request(app).get('/productos');
+
+    for (const producto of res.body) {
+      expect(typeof producto.tipo).toBe('string');
+      expect(producto.tipo.length).toBeGreaterThan(0);
     }
   });
 
@@ -43,6 +53,7 @@ describe('GET /productos/:id', () => {
     expect(res.body.id).toBe(1);
     expect(res.body).toHaveProperty('nombre');
     expect(res.body).toHaveProperty('precio');
+    expect(res.body).toHaveProperty('tipo');
   });
 
   test('responde 404 si el producto no existe', async () => {
@@ -65,5 +76,13 @@ describe('GET /productos/:id', () => {
     expect(res.status).toBe(200);
     expect(res.body.precio).toBe(5020);
   });
+
+  test('el tipo del producto 1 es un string no vacío', async () => {
+    const res = await request(app).get('/productos/1');
+
+    expect(res.status).toBe(200);
+    expect(typeof res.body.tipo).toBe('string');
+    expect(res.body.tipo.length).toBeGreaterThan(0);
+  })
 
 });
