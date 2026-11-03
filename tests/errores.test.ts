@@ -24,3 +24,34 @@ test('producto inexistente en pedido responde 404 con { "error": "..." }', async
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: expect.any(String) });
 });
+
+describe('Body inválido', () => {
+    test('JSON malformado responde 400 con { "error": "..." }', async () => {
+        const res = await request(app)
+            .post('/pedidos')
+            .set('Content-Type', 'application/json')
+            .send('{"items": [');
+
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({ error: expect.any(String) });
+    });
+
+    test.each([
+        ['sin items', {}],
+        ['items no es array', { items: 'hola' }],
+        ['cantidad no numérica', { items: [{ productoId: 1, cantidad: 'dos' }] }],
+        ['mesaID no numérico', { items: [{ productoId: 1, cantidad: 1 }], mesaID: 'abc' }],
+    ])('%s responde 400 con { "error": "..." }', async (_caso, body) => {
+        const res = await request(app).post('/pedidos').send(body);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({ error: expect.any(String) });
+    });
+
+    test('ruta inexistente responde 404 con { "error": "..." }', async () => {
+        const res = await request(app).get('/no-existe');
+
+        expect(res.status).toBe(404);
+        expect(res.body).toEqual({ error: expect.any(String) });
+    });
+});
