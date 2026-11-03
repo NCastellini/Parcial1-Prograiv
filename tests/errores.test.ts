@@ -15,3 +15,12 @@ describe('Errores estandarizados', () => {
         expect(res.body).toEqual({ error: expect.any(String) });
     });
 });
+
+test('producto inexistente en pedido responde 404 con { "error": "..." }', async () => {
+    const res = await request(app)
+        .post('/pedidos')
+        .send({ items: [{ productoId: 9999, cantidad: 1 }] });
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: expect.any(String) });
+});
