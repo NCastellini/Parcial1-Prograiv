@@ -11,4 +11,5 @@ export interface Pedido {
   items: ItemPedido[];
   estado: EstadoPedido;
   total: number;
+  mesaID?: number;
 }

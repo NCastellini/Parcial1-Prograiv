@@ -3,12 +3,13 @@ import { productos } from '../data/productosCafe.js';
 
 export const productosRouter = Router();
 
-// GET /productos te devuelve todos los productos con su precio calculado
+// GET /productos te devuelve todos los productos con su precio calculado y su tipo
 productosRouter.get('/', (_req: Request, res: Response) => {
   const resultado = productos.map((p) => ({
     id: p.id,
     nombre: p.nombre,
     precio: p.calcularPrecio(),
+    tipo: p.constructor.name,
   }));
 
   res.status(200).json(resultado);
@@ -34,5 +35,6 @@ productosRouter.get('/:id', (req: Request, res: Response) => {
     id: producto.id,
     nombre: producto.nombre,
     precio: producto.calcularPrecio(),
+    tipo: producto.constructor.name,
   });
 });

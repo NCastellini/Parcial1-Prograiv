@@ -30,9 +30,19 @@ pedidosRouter.get('/:id', (req: Request, res: Response) => {
 // POST /pedidos - Crea un nuevo pedido
 pedidosRouter.post('/', (req: Request, res: Response) => {
   try {
-    const entrada: ItemEntrada[] = req.body;
+    const { items, mesaID } = req.body ?? {};
 
-    const nuevoPedido = crearPedido(entrada);
+    if (!Array.isArray(items)) {
+      res.status(400).json({ error: 'items debe ser un array' });
+      return;
+    }
+
+    if (mesaID !== undefined && (typeof mesaID !== 'number' || !Number.isInteger(mesaID) || mesaID <= 0)) {
+      res.status(400).json({ error: 'mesaID debe ser un número entero positivo' });
+      return;
+    }
+
+    const nuevoPedido = crearPedido(items as ItemEntrada[], mesaID);
 
     res.status(201).json(nuevoPedido);
   } catch (error: any) {

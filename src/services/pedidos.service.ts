@@ -16,7 +16,7 @@ export function calcularTotal(items: ItemPedido[]): number {
     return items.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0);
 }
 
-export function crearPedido(entrada: ItemEntrada[]): Pedido {
+export function crearPedido(entrada: ItemEntrada[], mesaID?: number): Pedido {
     if (!Array.isArray(entrada) || entrada.length === 0) {
         throw new Error('El pedido debe tener al menos un item'); // Caso de error: El pedido está vacío.
     }
@@ -37,6 +37,7 @@ export function crearPedido(entrada: ItemEntrada[]): Pedido {
         items,
         estado: 'pendiente',
         total: calcularTotal(items),
+        ... (mesaID !== undefined && { mesaID }),
     };
     pedidos.push(pedido);
     return pedido;
