@@ -69,20 +69,25 @@ describe('GET /pedidos/:id', () => {
   });
 
   test('el pedido devuelto tiene id, items, estado y total', async () => {
-    pedidos.push({
+    const pedido = ({
       id: 5,
-      items: [{ productoId: 2, cantidad: 3, precioUnitario: 7420 }],
-      estado: 'pendiente',
+      items: [
+        { productoId: 2, cantidad: 3, precioUnitario: 7420 },
+        { productoId: 1, cantidad: 1, precioUnitario: 5020 },
+      ],
+      estado: 'pendiente' as const,
       total: 22260,
     });
+    pedidos.push(pedido);
 
     const res = await request(app).get('/pedidos/5');
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('id');
-    expect(res.body).toHaveProperty('items');
-    expect(res.body).toHaveProperty('estado');
-    expect(res.body).toHaveProperty('total');
+    expect(res.body).toEqual(pedido);
+    expect(res.body.estado).toBe('pendiente');
+    expect(res.body.items).toHaveLength(2);
+    expect(res.body.items[0]).toEqual({ productoId: 2, cantidad: 3, precioUnitario: 7420 });
+    expect(res.body.total).toBe(27280);
   });
 
 });
@@ -91,19 +96,57 @@ describe('GET /pedidos/:id', () => {
 describe('POST /pedidos', () => {
 
   test('responde 201 y crea un pedido exitosamente', async () => {
-    const nuevoPedido = [
-      { productoId: 1, cantidad: 2 }
-    ];
 
     const res = await request(app)
       .post('/pedidos')
-      .send(nuevoPedido);
+      .send({ items: [{ productoId: 1, cantidad: 2 }] });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('id');
     expect(res.body.estado).toBe('pendiente');
     expect(res.body.items).toHaveLength(1);
     expect(res.body.total).toBe(10040); // 5020 * 2
+  });
+
+  test('crea un pedido sin mesaID y no lo incluye en la respuesta', async () => {
+    const res = await request(app)
+      .post('/pedidos')
+      .send({ items: [{ productoId: 1, cantidad: 1 }] });
+
+    expect(res.status).toBe(201);
+    expect(res.body).not.toHaveProperty('mesaID');
+  });
+
+  test('acepta mesaID opcional y lo devuelve en la respuesta', async () => {
+    const res = await request(app)
+      .post('/pedidos')
+      .send({ items: [{ productoId: 1, cantidad: 2 }], mesaID: 3 });
+
+    expect(res.status).toBe(201);
+    expect(res.body.mesaID).toBe(3);
+    expect(res.body.estado).toBe('pendiente');
+    expect(res.body.total).toBe(10040);
+  });
+
+  test('el mesaID queda guardado y se recupera con GET /pedidos/:id', async () => {
+    const creado = await request(app)
+      .post('/pedidos')
+      .send({ items: [{ productoId: 1, cantidad: 2 }], mesaID: 3 });
+
+    const res = await request(app).get(`/pedidos/${creado.body.id}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(creado.body);
+    expect(res.body.mesaID).toBe(3);
+  });
+
+  test('responde 400 si mesaID no es un número válido', async () => {
+    const res = await request(app)
+      .post('/pedidos')
+      .send({ items: [{ productoId: 1, cantidad: 1 }], mesaID: 'abc' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
   });
 
   test('responde 400 si el array de items esta vacio', async () => {
