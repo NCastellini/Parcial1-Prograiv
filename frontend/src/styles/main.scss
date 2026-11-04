@@ -1,0 +1,7 @@
+// Variables personalizadas definidas ANTES de importar Bootstrap.
+$primary: #65432f;
+$secondary: #b58b63;
+$body-bg: #fffaf4;
+$body-color: #30251e;
+
+@import 'bootstrap/scss/bootstrap';
