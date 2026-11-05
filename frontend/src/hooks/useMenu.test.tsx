@@ -58,7 +58,6 @@ describe('useMenu', () => {
       'Expreso Colombia',
     );
     });
-
   
     it('cambia al estado error cuando falla la API', async () => {
     server.use(
@@ -84,7 +83,6 @@ describe('useMenu', () => {
         'No se pudo cargar el catálogo',
     );
     });
-
 
     it('permite reintentar la carga después de un error', async () => {
     let intentos = 0;
@@ -137,4 +135,30 @@ describe('useMenu', () => {
     expect(intentos).toBe(2);
     });
 
+    it('cambia al estado error cuando la respuesta no cumple el schema Zod', async () => {
+    server.use(
+        http.get('/productos', () => {
+        return HttpResponse.json([
+            {
+            id: 1,
+            nombre: 'Expreso Brasil (Pocillo)',
+            precio: 5020,
+            tipo: 'Expreso',
+            },
+        ]);
+        }),
+    );
+
+    const { result } = renderHook(() => useMenu());
+
+    await waitFor(() => {
+        expect(result.current.estado.estado).toBe('error');
+    });
+
+    if (result.current.estado.estado !== 'error') {
+        throw new Error('El menú no alcanzó el estado error');
+    }
+
+    expect(result.current.estado.mensaje).toBeTruthy();
+    });
 });
