@@ -86,4 +86,31 @@ describe('Menu', () => {
 
     expect(reintentar).toHaveBeenCalledOnce();
     });
+
+    it('muestra un mensaje amigable sin exponer errores técnicos de Zod', () => {
+    vi.mocked(useMenu).mockReturnValue({
+        estado: {
+        estado: 'error',
+        mensaje:
+            '[{"code":"invalid_union","path":[0,"tipo"],"message":"No matching discriminator"}]',
+        },
+        reintentar: vi.fn(),
+    });
+
+    render(<Menu />);
+
+    const alerta = screen.getByRole('alert');
+
+    expect(alerta).toHaveTextContent('No pudimos cargar el menú');
+    expect(alerta).toHaveTextContent(
+        'Ocurrió un problema al obtener los productos. Intentá nuevamente.',
+    );
+
+    expect(alerta).not.toHaveTextContent('invalid_union');
+    expect(alerta).not.toHaveTextContent('No matching discriminator');
+
+    expect(
+        screen.getByRole('button', { name: 'Reintentar' }),
+    ).toBeInTheDocument();
+    });
 });
