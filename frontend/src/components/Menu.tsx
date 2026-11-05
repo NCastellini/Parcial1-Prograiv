@@ -1,7 +1,7 @@
 import { useMenu } from '../hooks/useMenu';
 
 export default function Menu() {
-  const { estado } = useMenu();
+  const { estado, reintentar } = useMenu();
 
   if (estado.estado === 'cargando') {
     return (
@@ -48,6 +48,24 @@ export default function Menu() {
       </section>
     );
   }
+
+    if (estado.estado === 'error') {
+    return (
+        <section aria-label="Menú">
+        <div className="alert alert-danger" role="alert">
+            <p className="mb-3">{estado.mensaje}</p>
+
+            <button
+            type="button"
+            className="btn btn-outline-danger"
+            onClick={reintentar}
+            >
+            Reintentar
+            </button>
+        </div>
+        </section>
+    );
+    }
 
   return null;
 }
