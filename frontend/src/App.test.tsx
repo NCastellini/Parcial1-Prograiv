@@ -1,10 +1,17 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import App from './App';
 import { http, HttpResponse } from 'msw';
 import { server } from './test/server';
 
 describe('Integración de App con mesa desde URL', () => {
+  beforeEach(() => {
+    server.use(
+        http.get('/productos', () => {
+            return HttpResponse.json([]);
+        }),
+    );
+  });
   afterEach(() => {
     cleanup();
     window.history.replaceState({}, '', '/');
