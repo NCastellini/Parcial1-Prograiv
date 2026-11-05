@@ -1,4 +1,5 @@
 import Header from './components/Header';
+import Menu from './components/Menu';
 import { leerMesaDesdeUrl } from './utils/leerMesaDesdeUrl';
 
 export default function App() {
@@ -11,6 +12,8 @@ export default function App() {
       <main className="container py-4">
         <h2>Menú de Cafetería Origen</h2>
         <p>Seleccioná tus productos para hacer un pedido.</p>
+        
+        <Menu />
       </main>
     </>
   );
