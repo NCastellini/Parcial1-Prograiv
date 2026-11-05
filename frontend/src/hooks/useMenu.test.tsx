@@ -5,13 +5,20 @@ import { server } from '../test/server';
 import { useMenu } from './useMenu';
 
 describe('useMenu', () => {
-  it('comienza en estado cargando', () => {
+    it('comienza en estado cargando', () => {
+    server.use(
+        http.get('/productos', async () => {
+        await new Promise(() => {});
+        return HttpResponse.json([]);
+        }),
+    );
+
     const { result } = renderHook(() => useMenu());
 
     expect(result.current.estado.estado).toBe('cargando');
-  });
+    });
 
-  it('carga los productos y cambia al estado listo', async () => {
+    it('carga los productos y cambia al estado listo', async () => {
     server.use(
       http.get('/productos', () => {
         return HttpResponse.json([
