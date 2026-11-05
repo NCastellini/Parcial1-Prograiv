@@ -17,5 +17,37 @@ export default function Menu() {
     );
   }
 
+  if (estado.estado === 'listo') {
+    return (
+      <section aria-label="Menú">
+        <div className="row g-3">
+          {estado.productos.map((producto) => (
+            <div className="col-12 col-md-6 col-lg-4" key={producto.id}>
+              <article className="card h-100">
+                <div className="card-body">
+                  <h3 className="h5 card-title">
+                    {producto.nombre}
+                  </h3>
+
+                  <p className="card-text">
+                    {producto.tipo === 'pasteleria'
+                      ? 'Pastelería'
+                      : producto.tipo === 'expreso'
+                        ? 'Expreso'
+                        : 'Filtrado'}
+                  </p>
+
+                  <p className="fw-bold mb-0">
+                    ${producto.precio.toLocaleString('es-AR')}
+                  </p>
+                </div>
+              </article>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return null;
 }
