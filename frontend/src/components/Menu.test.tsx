@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Menu from './Menu';
 import { useMenu } from '../hooks/useMenu';
 
@@ -59,4 +60,30 @@ describe('Menu', () => {
     expect(screen.getByText('$1.500')).toBeInTheDocument();
     });
 
+    it('muestra el error y permite reintentar la carga', async () => {
+    const usuario = userEvent.setup();
+    const reintentar = vi.fn();
+
+    vi.mocked(useMenu).mockReturnValue({
+        estado: {
+        estado: 'error',
+        mensaje: 'No se pudo cargar el catálogo',
+        },
+        reintentar,
+    });
+
+    render(<Menu />);
+
+    expect(
+        screen.getByRole('alert')
+    ).toHaveTextContent('No se pudo cargar el catálogo');
+
+    const boton = screen.getByRole('button', {
+        name: 'Reintentar',
+    });
+
+    await usuario.click(boton);
+
+    expect(reintentar).toHaveBeenCalledOnce();
+    });
 });
