@@ -25,9 +25,17 @@ export function useMenu() {
             productos,
           });
         }
-      } catch {
-        //el manejo de errores lo implemento en el siguiente ciclo TDD
-      }
+          } catch (error: unknown) {
+            if (activo) {
+              setEstado({
+                estado: 'error',
+                mensaje:
+                  error instanceof Error
+                    ? error.message
+                    : 'No se pudo cargar el menú',
+              });
+            }
+          }
     }
 
     void cargarProductos();
