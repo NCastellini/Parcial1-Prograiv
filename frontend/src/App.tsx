@@ -1,3 +1,17 @@
+import Header from './components/Header';
+import { leerMesaDesdeUrl } from './utils/leerMesaDesdeUrl';
+
 export default function App() {
-  return <main className="container py-4"><h1>Cafetería Origen</h1></main>;
+  const mesa = leerMesaDesdeUrl(window.location.href);
+
+  return (
+    <>
+      <Header mesa={mesa} />
+
+      <main className="container py-4">
+        <h2>Menú de Cafetería Origen</h2>
+        <p>Seleccioná tus productos para hacer un pedido.</p>
+      </main>
+    </>
+  );
 }
