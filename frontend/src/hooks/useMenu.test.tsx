@@ -57,5 +57,32 @@ describe('useMenu', () => {
     expect(result.current.estado.productos[0].nombre).toBe(
       'Expreso Colombia',
     );
-  });
+    });
+
+  
+    it('cambia al estado error cuando falla la API', async () => {
+    server.use(
+        http.get('/productos', () => {
+        return HttpResponse.json(
+            { error: 'No se pudo cargar el catálogo' },
+            { status: 500 },
+        );
+        }),
+    );
+
+    const { result } = renderHook(() => useMenu());
+
+    await waitFor(() => {
+        expect(result.current.estado.estado).toBe('error');
+    });
+
+    if (result.current.estado.estado !== 'error') {
+        throw new Error('El menú no alcanzó el estado error');
+    }
+
+    expect(result.current.estado.mensaje).toBe(
+        'No se pudo cargar el catálogo',
+    );
+    });
+
 });
