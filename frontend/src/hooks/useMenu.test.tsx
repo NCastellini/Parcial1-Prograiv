@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { server } from '../test/server';
 import { useMenu } from './useMenu';
@@ -83,6 +83,58 @@ describe('useMenu', () => {
     expect(result.current.estado.mensaje).toBe(
         'No se pudo cargar el catálogo',
     );
+    });
+
+
+    it('permite reintentar la carga después de un error', async () => {
+    let intentos = 0;
+
+    server.use(
+        http.get('/productos', () => {
+        intentos++;
+
+        if (intentos === 1) {
+            return HttpResponse.json(
+            { error: 'Servicio temporalmente no disponible' },
+            { status: 503 },
+            );
+        }
+
+        return HttpResponse.json([
+            {
+            id: 1,
+            tipo: 'pasteleria',
+            nombre: 'Medialuna',
+            precio: 1500,
+            },
+        ]);
+        }),
+    );
+
+    const { result } = renderHook(() => useMenu());
+
+    await waitFor(() => {
+        expect(result.current.estado.estado).toBe('error');
+    });
+
+    act(() => {
+        result.current.reintentar();
+    });
+
+    expect(result.current.estado.estado).toBe('cargando');
+
+    await waitFor(() => {
+        expect(result.current.estado.estado).toBe('listo');
+    });
+
+    if (result.current.estado.estado !== 'listo') {
+        throw new Error('El menú no alcanzó el estado listo');
+    }
+
+    expect(result.current.estado.productos[0].nombre).toBe(
+        'Medialuna',
+    );
+    expect(intentos).toBe(2);
     });
 
 });
