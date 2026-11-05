@@ -49,23 +49,29 @@ export default function Menu() {
     );
   }
 
-    if (estado.estado === 'error') {
+  if (estado.estado === 'error') {
     return (
-        <section aria-label="Menú">
+      <section aria-label="Menú">
         <div className="alert alert-danger" role="alert">
-            <p className="mb-3">{estado.mensaje}</p>
+          <p className="fw-semibold mb-2">
+            No pudimos cargar el menú
+          </p>
 
-            <button
+          <p className="mb-3">
+            Ocurrió un problema al obtener los productos. Intentá nuevamente.
+          </p>
+
+          <button
             type="button"
             className="btn btn-outline-danger"
             onClick={reintentar}
-            >
+          >
             Reintentar
-            </button>
+          </button>
         </div>
-        </section>
+      </section>
     );
-    }
+  }
 
   return null;
 }

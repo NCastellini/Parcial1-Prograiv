@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Menu from './Menu';
 import { useMenu } from '../hooks/useMenu';
@@ -7,6 +7,10 @@ import { useMenu } from '../hooks/useMenu';
 vi.mock('../hooks/useMenu', () => ({
   useMenu: vi.fn(),
 }));
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('Menu', () => {
     it('muestra un indicador mientras se carga el menú', () => {
@@ -76,7 +80,7 @@ describe('Menu', () => {
 
     expect(
         screen.getByRole('alert')
-    ).toHaveTextContent('No se pudo cargar el catálogo');
+    ).toHaveTextContent('No pudimos cargar el menú');
 
     const boton = screen.getByRole('button', {
         name: 'Reintentar',
@@ -87,7 +91,7 @@ describe('Menu', () => {
     expect(reintentar).toHaveBeenCalledOnce();
     });
 
-    it('muestra un mensaje amigable sin exponer errores técnicos de Zod', () => {
+    it('muestra un mensaje descriptivo sin exponer errores técnicos de Zod', () => {
     vi.mocked(useMenu).mockReturnValue({
         estado: {
         estado: 'error',
