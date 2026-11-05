@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api/client';
 import type { Producto } from '../api/schemas';
 
@@ -11,6 +11,13 @@ export function useMenu() {
   const [estado, setEstado] = useState<EstadoMenu>({
     estado: 'cargando',
   });
+
+  const [intento, setIntento] = useState(0);
+
+  const reintentar = useCallback(() => {
+    setEstado({ estado: 'cargando' });
+    setIntento((actual) => actual + 1);
+  }, []);
 
   useEffect(() => {
     let activo = true;
@@ -25,17 +32,17 @@ export function useMenu() {
             productos,
           });
         }
-          } catch (error: unknown) {
-            if (activo) {
-              setEstado({
-                estado: 'error',
-                mensaje:
-                  error instanceof Error
-                    ? error.message
-                    : 'No se pudo cargar el menú',
-              });
-            }
-          }
+      } catch (error: unknown) {
+        if (activo) {
+          setEstado({
+            estado: 'error',
+            mensaje:
+              error instanceof Error
+                ? error.message
+                : 'No se pudo cargar el menú',
+          });
+        }
+      }
     }
 
     void cargarProductos();
@@ -43,7 +50,7 @@ export function useMenu() {
     return () => {
       activo = false;
     };
-  }, []);
+  }, [intento]);
 
-  return { estado };
+  return { estado, reintentar };
 }
