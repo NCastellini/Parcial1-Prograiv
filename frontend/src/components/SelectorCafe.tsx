@@ -12,7 +12,7 @@ const bebidas = [
     { valor: 'filtrado', etiqueta: 'Filtrado' },
 ] as const;
 
-export default function SelectorCafe({ productos }: SelectorCafeProps) {
+export default function SelectorCafe({ productos, onAgregar }: SelectorCafeProps) {
     const cafes = productos.filter(esCafe);
     const tamanios = Array.from(new Set(cafes.map((c) => c.tamanio)));
     const origenes = cafes.reduce<{ nombre: string; descripcion: string }[]>(
@@ -98,7 +98,12 @@ export default function SelectorCafe({ productos }: SelectorCafeProps) {
                 })}
             </fieldset>
 
-            <button type="button" className="btn btn-primary" disabled={!productoElegido}>
+            <button
+                type="button"
+                className="btn btn-primary"
+                disabled={!productoElegido}
+                onClick={() => productoElegido && onAgregar(productoElegido)}
+            >
                 Agregar
             </button>
         </section>
