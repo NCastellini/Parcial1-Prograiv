@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SelectorCafe from './SelectorCafe';
 import { productosEjemplo } from '../test/productosEjemplo';
+
+afterEach(() => {
+    cleanup();
+});
 
 function renderizar() {
     const onAgregar = vi.fn();
@@ -30,5 +34,25 @@ describe('SelectorCafe', () => {
         await user.click(screen.getByRole('radio', { name: /colombia/i }));
 
         expect(botonAgregar()).toBeEnabled();
+    });
+    it('mantiene Agregar deshabilitado si falta la bebida', async () => {
+        const { user } = renderizar();
+        await user.click(screen.getByRole('radio', { name: 'Mediano' }));
+        await user.click(screen.getByRole('radio', { name: /colombia/i }));
+        expect(botonAgregar()).toBeDisabled();
+    });
+
+    it('mantiene Agregar deshabilitado si falta el tamaño', async () => {
+        const { user } = renderizar();
+        await user.click(screen.getByRole('radio', { name: 'Expreso' }));
+        await user.click(screen.getByRole('radio', { name: /colombia/i }));
+        expect(botonAgregar()).toBeDisabled();
+    });
+
+    it('mantiene Agregar deshabilitado si falta el origen', async () => {
+        const { user } = renderizar();
+        await user.click(screen.getByRole('radio', { name: 'Expreso' }));
+        await user.click(screen.getByRole('radio', { name: 'Mediano' }));
+        expect(botonAgregar()).toBeDisabled();
     });
 });
