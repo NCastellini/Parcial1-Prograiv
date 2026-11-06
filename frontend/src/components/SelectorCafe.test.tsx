@@ -1,0 +1,25 @@
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import SelectorCafe from './SelectorCafe';
+import { productosEjemplo } from '../test/productosEjemplo';
+
+function renderizar() {
+  const onAgregar = vi.fn();
+  const user = userEvent.setup();
+  render(<SelectorCafe productos={productosEjemplo} onAgregar={onAgregar} />);
+  return { user, onAgregar };
+}
+
+const botonAgregar = () => screen.getByRole('button', { name: /agregar/i });
+
+describe('SelectorCafe', () => {
+     it('muestra los tres pasos y el botón Agregar deshabilitado', () => {
+    renderizar();
+
+    expect(screen.getByRole('group', { name: 'Bebida' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Tamaño' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Origen' })).toBeInTheDocument();
+    expect(botonAgregar()).toBeDisabled();
+  });
+});
