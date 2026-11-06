@@ -55,4 +55,11 @@ describe('SelectorCafe', () => {
         await user.click(screen.getByRole('radio', { name: 'Mediano' }));
         expect(botonAgregar()).toBeDisabled();
     });
+    it('muestra la descripción de cada origen', () => {
+        renderizar();
+
+        expect(screen.getByText(/acidez media, cuerpo equilibrado/i)).toBeInTheDocument();
+        expect(screen.getByText(/acidez baja, cuerpo alto/i)).toBeInTheDocument();
+        expect(screen.getByText(/acidez alta, cuerpo ligero/i)).toBeInTheDocument();
+    });
 });
