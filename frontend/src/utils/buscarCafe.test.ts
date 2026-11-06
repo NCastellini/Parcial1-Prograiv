@@ -11,4 +11,13 @@ describe('buscarCafe', () => {
 
     expect(resultado?.id).toBe(5);
   });
+
+    it('distingue el producto por origen', () => {
+    const resultado = buscarCafe(
+      { tipo: 'expreso', tamanio: 'Mediano', origen: 'Brasil' },
+      productosEjemplo,
+    );
+
+    expect(resultado?.id).toBe(6);
+  });
 });
