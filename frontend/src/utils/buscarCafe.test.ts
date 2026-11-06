@@ -20,4 +20,12 @@ describe('buscarCafe', () => {
 
     expect(resultado?.id).toBe(6);
   });
+    it('devuelve undefined si la combinación no existe', () => {
+    const resultado = buscarCafe(
+      { tipo: 'filtrado', tamanio: 'Mediano', origen: 'Brasil' },
+      productosEjemplo,
+    );
+
+    expect(resultado).toBeUndefined();
+  });
 });
