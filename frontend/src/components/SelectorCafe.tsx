@@ -1,111 +1,56 @@
 import { useState } from 'react';
 import type { Producto } from '../api/schemas';
 import { buscarCafe, esCafe, type TipoBebida } from '../utils/buscarCafe';
+import PasoBebida from './PasoBebida';
+import PasoTamanio from './PasoTamanio';
+import PasoOrigen from './PasoOrigen';
 
 type SelectorCafeProps = {
-    productos: Producto[];
-    onAgregar: (producto: Producto) => void;
+  productos: Producto[];
+  onAgregar: (producto: Producto) => void;
 };
 
-const bebidas = [
-    { valor: 'expreso', etiqueta: 'Expreso' },
-    { valor: 'filtrado', etiqueta: 'Filtrado' },
-] as const;
-
 export default function SelectorCafe({ productos, onAgregar }: SelectorCafeProps) {
-    const cafes = productos.filter(esCafe);
-    const tamanios = Array.from(new Set(cafes.map((c) => c.tamanio)));
-    const origenes = cafes.reduce<{ nombre: string; descripcion: string }[]>(
-        (acc, c) =>
-            acc.some((o) => o.nombre === c.variedad.nombre) ? acc : [...acc, c.variedad],
-        [],
-    );
+  const [tipo, setTipo] = useState<TipoBebida | null>(null);
+  const [tamanio, setTamanio] = useState<string | null>(null);
+  const [origen, setOrigen] = useState<string | null>(null);
 
-    const [tipo, setTipo] = useState<TipoBebida | null>(null);
-    const [tamanio, setTamanio] = useState<string | null>(null);
-    const [origen, setOrigen] = useState<string | null>(null);
+  const cafes = productos.filter(esCafe);
+  const tamanios = Array.from(new Set(cafes.map((c) => c.tamanio)));
 
-    const productoElegido =
-        tipo !== null && tamanio !== null && origen !== null
-            ? buscarCafe({ tipo, tamanio, origen }, productos)
-            : undefined;
+  const opcionesOrigen = cafes
+    .reduce<{ nombre: string; descripcion: string }[]>(
+      (acc, c) =>
+        acc.some((o) => o.nombre === c.variedad.nombre) ? acc : [...acc, c.variedad],
+      [],
+    )
+    .map((o) => ({
+      ...o,
+      precio:
+        tipo !== null && tamanio !== null
+          ? buscarCafe({ tipo, tamanio, origen: o.nombre }, productos)?.precio
+          : undefined,
+    }));
 
-    function precioDe(nombreOrigen: string): number | undefined {
-        if (tipo === null || tamanio === null) return undefined;
-        return buscarCafe({ tipo, tamanio, origen: nombreOrigen }, productos)?.precio;
-    }
+  const productoElegido =
+    tipo !== null && tamanio !== null && origen !== null
+      ? buscarCafe({ tipo, tamanio, origen }, productos)
+      : undefined;
 
-    return (
-        <section aria-label="Armá tu café">
-            <fieldset className="mb-3">
-                <legend className="h6">Bebida</legend>
-                {bebidas.map((b) => (
-                    <div className="form-check" key={b.valor}>
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="bebida"
-                            id={`bebida-${b.valor}`}
-                            checked={tipo === b.valor}
-                            onChange={() => setTipo(b.valor)}
-                        />
-                        <label className="form-check-label" htmlFor={`bebida-${b.valor}`}>
-                            {b.etiqueta}
-                        </label>
-                    </div>
-                ))}
-            </fieldset>
+  return (
+    <section aria-label="Armá tu café">
+      <PasoBebida valor={tipo} onCambio={setTipo} />
+      <PasoTamanio opciones={tamanios} valor={tamanio} onCambio={setTamanio} />
+      <PasoOrigen opciones={opcionesOrigen} valor={origen} onCambio={setOrigen} />
 
-            <fieldset className="mb-3">
-                <legend className="h6">Tamaño</legend>
-                {tamanios.map((t) => (
-                    <div className="form-check" key={t}>
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="tamanio"
-                            id={`tamanio-${t}`}
-                            checked={tamanio === t}
-                            onChange={() => setTamanio(t)}
-                        />
-                        <label className="form-check-label" htmlFor={`tamanio-${t}`}>
-                            {t}
-                        </label>
-                    </div>
-                ))}
-            </fieldset>
-
-            <fieldset className="mb-3">
-                <legend className="h6">Origen</legend>
-                {origenes.map((o) => {
-                    const precio = precioDe(o.nombre);
-                    return (
-                        <div className="form-check" key={o.nombre}>
-                            <input className="form-check-input" type="radio" name="origen"
-                                id={`origen-${o.nombre}`} checked={origen === o.nombre}
-                                onChange={() => setOrigen(o.nombre)} />
-                            <label className="form-check-label" htmlFor={`origen-${o.nombre}`}>
-                                <span className="fw-semibold">{o.nombre}</span>
-                                <small className="d-block text-muted">{o.descripcion}</small>
-                                {precio !== undefined && (
-                                    <span className="d-block fw-bold">
-                                        ${precio.toLocaleString('es-AR')}
-                                    </span>
-                                )}
-                            </label>
-                        </div>
-                    );
-                })}
-            </fieldset>
-
-            <button
-                type="button"
-                className="btn btn-primary"
-                disabled={!productoElegido}
-                onClick={() => productoElegido && onAgregar(productoElegido)}
-            >
-                Agregar
-            </button>
-        </section>
-    );
+      <button
+        type="button"
+        className="btn btn-primary"
+        disabled={!productoElegido}
+        onClick={() => productoElegido && onAgregar(productoElegido)}
+      >
+        Agregar
+      </button>
+    </section>
+  );
 }
