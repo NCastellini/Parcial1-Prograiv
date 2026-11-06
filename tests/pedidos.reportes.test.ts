@@ -14,13 +14,9 @@ describe('Endpoints de Pedidos y Reportes', () => {
   describe('POST /pedidos', () => {
 
     test('responde 201 y crea un pedido exitosamente', async () => {
-      const nuevoPedido = [
-        { productoId: 1, cantidad: 2 }
-      ];
-
       const res = await request(app)
         .post('/pedidos')
-        .send(nuevoPedido);
+        .send({ items: [{ productoId: 1, cantidad: 2 }] });
 
       expect(res.status).toBe(201);
       expect(res.body).toHaveProperty('id');
@@ -66,8 +62,12 @@ describe('Endpoints de Pedidos y Reportes', () => {
       // 1) Cantidad 1 del producto 1 -> 5020
       // 2) Cantidad 2 del producto 1 -> 10040
       // Total esperado: 15060
-      await request(app).post('/pedidos').send([{ productoId: 1, cantidad: 1 }]);
-      await request(app).post('/pedidos').send([{ productoId: 1, cantidad: 2 }]);
+      const r1 = await request(app).post('/pedidos').send({ items: [{ productoId: 1, cantidad: 1 }] });
+      const r2 = await request(app).post('/pedidos').send({ items: [{ productoId: 1, cantidad: 2 }] });
+
+      // Pasa la respuesta a JSON para leer el valor del mensaje de éxito
+      expect(r1.status, JSON.stringify(r1.body)).toBe(201);
+      expect(r2.status, JSON.stringify(r2.body)).toBe(201);
 
       const res = await request(app).get('/reportes/facturacion');
 
@@ -90,8 +90,11 @@ describe('Endpoints de Pedidos y Reportes', () => {
 
     test('responde 200 y devuelve el producto mas vendido correctamente', async () => {
       // Creamos un pedido con mayor cantidad del producto 1
-      await request(app).post('/pedidos').send([{ productoId: 1, cantidad: 3 }]);
-      await request(app).post('/pedidos').send([{ productoId: 2, cantidad: 1 }]);
+      const r1 = await request(app).post('/pedidos').send({ items: [{ productoId: 1, cantidad: 3 }] });
+      const r2 = await request(app).post('/pedidos').send({ items: [{ productoId: 2, cantidad: 1 }] });
+
+      expect(r1.status, JSON.stringify(r1.body)).toBe(201);
+      expect(r2.status, JSON.stringify(r2.body)).toBe(201);
 
       const res = await request(app).get('/reportes/mas-vendido');
 
