@@ -73,4 +73,12 @@ describe('SelectorCafe', () => {
         expect(screen.getByText(/6\.?900/)).toBeInTheDocument();
         expect(screen.getByText(/8\.?100/)).toBeInTheDocument();
     });
+
+    it('no muestra precios si la elección está incompleta', async () => {
+        const { user } = renderizar();
+        expect(screen.queryByText(/\$/)).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('radio', { name: 'Expreso' }));
+        expect(screen.queryByText(/\$/)).not.toBeInTheDocument();
+    });
 });
