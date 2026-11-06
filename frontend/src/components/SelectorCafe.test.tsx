@@ -81,4 +81,15 @@ describe('SelectorCafe', () => {
         await user.click(screen.getByRole('radio', { name: 'Expreso' }));
         expect(screen.queryByText(/\$/)).not.toBeInTheDocument();
     });
+
+    it('llama a onAgregar con el producto elegido', async () => {
+        const { user, onAgregar } = renderizar();
+
+        await user.click(screen.getByRole('radio', { name: 'Expreso' }));
+        await user.click(screen.getByRole('radio', { name: 'Mediano' }));
+        await user.click(screen.getByRole('radio', { name: /brasil/i }));
+        await user.click(botonAgregar());
+
+        expect(onAgregar).toHaveBeenCalledWith(expect.objectContaining({ id: 6 }));
+    });
 });
