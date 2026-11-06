@@ -55,11 +55,22 @@ describe('SelectorCafe', () => {
         await user.click(screen.getByRole('radio', { name: 'Mediano' }));
         expect(botonAgregar()).toBeDisabled();
     });
+
     it('muestra la descripción de cada origen', () => {
         renderizar();
 
         expect(screen.getByText(/acidez media, cuerpo equilibrado/i)).toBeInTheDocument();
         expect(screen.getByText(/acidez baja, cuerpo alto/i)).toBeInTheDocument();
         expect(screen.getByText(/acidez alta, cuerpo ligero/i)).toBeInTheDocument();
+    });
+    it('muestra el precio de cada origen con bebida y tamaño elegidos', async () => {
+        const { user } = renderizar();
+
+        await user.click(screen.getByRole('radio', { name: 'Expreso' }));
+        await user.click(screen.getByRole('radio', { name: 'Mediano' }));
+
+        expect(screen.getByText(/7\.?360/)).toBeInTheDocument();
+        expect(screen.getByText(/6\.?900/)).toBeInTheDocument();
+        expect(screen.getByText(/8\.?100/)).toBeInTheDocument();
     });
 });
