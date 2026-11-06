@@ -19,5 +19,10 @@ export function buscarCafe(
 ): ProductoCafe | undefined {
   return productos
     .filter(esCafe)
-    .find((p) => p.tipo === eleccion.tipo && p.tamanio === eleccion.tamanio);
+        .find(
+      (p) =>
+        p.tipo === eleccion.tipo &&
+        p.tamanio === eleccion.tamanio &&
+        p.variedad.nombre === eleccion.origen,
+    );
 }
