@@ -30,6 +30,11 @@ export default function SelectorCafe({ productos }: SelectorCafeProps) {
             ? buscarCafe({ tipo, tamanio, origen }, productos)
             : undefined;
 
+    function precioDe(nombreOrigen: string): number | undefined {
+        if (tipo === null || tamanio === null) return undefined;
+        return buscarCafe({ tipo, tamanio, origen: nombreOrigen }, productos)?.precio;
+    }
+
     return (
         <section aria-label="Armá tu café">
             <fieldset className="mb-3">
@@ -72,22 +77,25 @@ export default function SelectorCafe({ productos }: SelectorCafeProps) {
 
             <fieldset className="mb-3">
                 <legend className="h6">Origen</legend>
-                {origenes.map((o) => (
-                    <div className="form-check" key={o.nombre}>
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="origen"
-                            id={`origen-${o.nombre}`}
-                            checked={origen === o.nombre}
-                            onChange={() => setOrigen(o.nombre)}
-                        />
-                        <label className="form-check-label" htmlFor={`origen-${o.nombre}`}>
-                            <span className="fw-semibold">{o.nombre}</span>
-                            <small className="d-block text-muted">{o.descripcion}</small>
-                        </label>
-                    </div>
-                ))}
+                {origenes.map((o) => {
+                    const precio = precioDe(o.nombre);
+                    return (
+                        <div className="form-check" key={o.nombre}>
+                            <input className="form-check-input" type="radio" name="origen"
+                                id={`origen-${o.nombre}`} checked={origen === o.nombre}
+                                onChange={() => setOrigen(o.nombre)} />
+                            <label className="form-check-label" htmlFor={`origen-${o.nombre}`}>
+                                <span className="fw-semibold">{o.nombre}</span>
+                                <small className="d-block text-muted">{o.descripcion}</small>
+                                {precio !== undefined && (
+                                    <span className="d-block fw-bold">
+                                        ${precio.toLocaleString('es-AR')}
+                                    </span>
+                                )}
+                            </label>
+                        </div>
+                    );
+                })}
             </fieldset>
 
             <button type="button" className="btn btn-primary" disabled={!productoElegido}>
