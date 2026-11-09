@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, fireEvent } from '@testing-library/react'
 import { TarjetaPasteleria } from './TarjetaPasteleria.js'
 
 const muffin = {
@@ -16,5 +16,17 @@ describe('TarjetaPasteleria', () => {
     )
 
     expect(getByText('Muffin de chocolate')).toBeDefined()
+  })
+
+  it('llama a onAgregar con el producto al hacer clic en el boton', () => {
+    const onAgregarMock = vi.fn()
+    const { getByRole } = render(
+      TarjetaPasteleria({ producto: muffin, onAgregar: onAgregarMock })
+    )
+
+    const boton = getByRole('button', { name: /agregar/i })
+    fireEvent.click(boton)
+
+    expect(onAgregarMock).toHaveBeenCalledWith(muffin)
   })
 })
