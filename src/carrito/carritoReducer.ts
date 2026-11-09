@@ -1,76 +1,45 @@
-export type ProductoCarrito = {
+export type ItemCarrito = {
   id: number
   nombre: string
   precio: number
-  tipo: 'expreso' | 'filtrado' | 'pasteleria'
+  cantidad: number
 }
 
-export type ItemCarrito = { producto: ProductoCarrito; cantidad: number }
-
-export type EstadoCarrito = { items: ItemCarrito[] }
-
-export type AccionCarrito =
-  | { type: 'AGREGAR'; producto: ProductoCarrito }
-  | { type: 'RESTAR'; productoId: number }
-  | { type: 'QUITAR'; productoId: number }
+export type ActionCarrito =
+  | { type: 'AGREGAR'; payload: ItemCarrito }
+  | { type: 'RESTAR'; payload: { id: number } }
+  | { type: 'QUITAR'; payload: { id: number } }
   | { type: 'VACIAR' }
 
-export const estadoInicial: EstadoCarrito = { items: [] }
-
-export function carritoReducer(
-  estado: EstadoCarrito,
-  accion: AccionCarrito,
-): EstadoCarrito {
-  switch (accion.type) {
+export function carritoReducer(state: ItemCarrito[], action: ActionCarrito): ItemCarrito[] {
+  switch (action.type) {
     case 'AGREGAR': {
-      const yaEsta = estado.items.some(
-        (item) => item.producto.id === accion.producto.id,
-      )
-
-      if (!yaEsta) {
-        return {
-          items: [...estado.items, { producto: accion.producto, cantidad: 1 }],
-        }
+      const existe = state.find(item => item.id === action.payload.id)
+      if (existe) {
+        return state.map(item =>
+          item.id === action.payload.id
+            ? { ...item, cantidad: item.cantidad + (action.payload.cantidad || 1) }
+            : item
+        )
       }
-
-      return {
-        items: estado.items.map((item) =>
-          item.producto.id === accion.producto.id
-            ? { ...item, cantidad: item.cantidad + 1 }
-            : item,
-        ),
-      }
+      return [...state, { ...action.payload, cantidad: action.payload.cantidad || 1 }]
     }
     case 'RESTAR': {
-      const index = estado.items.findIndex(
-        (item) => item.producto.id === accion.productoId
-      )
-
-      if (index >= 0) {
-        const nuevosItems = [...estado.items]
-        if (nuevosItems[index].cantidad > 1) {
-          nuevosItems[index] = {
-            ...nuevosItems[index],
-            cantidad: nuevosItems[index].cantidad - 1,
-          }
-          return { items: nuevosItems }
-        } else {
-          nuevosItems.splice(index, 1)
-          return { items: nuevosItems }
-        }
-      }
-      return estado
+      return state
+        .map(item =>
+          item.id === action.payload.id
+            ? { ...item, cantidad: item.cantidad - 1 }
+            : item
+        )
+        .filter(item => item.cantidad > 0)
     }
     case 'QUITAR': {
-      const nuevosItems = estado.items.filter(
-        (item) => item.producto.id !== accion.productoId
-      )
-      return { items: nuevosItems }
+      return state.filter(item => item.id !== action.payload.id)
     }
     case 'VACIAR': {
-      return { items: [] }
+      return []
     }
     default:
-      return estado
+      return state
   }
 }
