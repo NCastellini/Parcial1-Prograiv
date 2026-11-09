@@ -12,10 +12,15 @@ export type PropsTarjetaPasteleria = {
   onAgregar: (producto: ProductoPasteleria) => void
 }
 
-export function TarjetaPasteleria({ producto }: PropsTarjetaPasteleria) {
+export function TarjetaPasteleria({ producto, onAgregar }: PropsTarjetaPasteleria) {
   return React.createElement(
     'article',
     null,
-    React.createElement('h3', null, producto.nombre)
+    React.createElement('h3', null, producto.nombre),
+    React.createElement(
+      'button',
+      { onClick: () => onAgregar(producto) },
+      'Agregar al carrito'
+    )
   )
 }
