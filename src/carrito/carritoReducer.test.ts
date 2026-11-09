@@ -1,47 +1,65 @@
 import { describe, it, expect } from 'vitest'
-import { carritoReducer, estadoInicial } from './carritoReducer.js'
-
-const muffin = {
-  id: 1,
-  nombre: 'Muffin de chocolate',
-  precio: 2500,
-  tipo: 'pasteleria' as const,
-}
+import { carritoReducer, ItemCarrito, ActionCarrito } from './carritoReducer.js'
 
 describe('carritoReducer', () => {
-  it('AGREGAR suma un producto nuevo al carrito', () => {
-    const resultado = carritoReducer(estadoInicial, {
-      type: 'AGREGAR',
-      producto: muffin,
-    })
+  it('agrega un producto nuevo al carrito', () => {
+    const estadoInicial: ItemCarrito[] = []
+    const producto: ItemCarrito = { id: 1, nombre: 'Cafe', precio: 1000, cantidad: 1 }
+    const accion: ActionCarrito = { type: 'AGREGAR', payload: producto }
 
-    expect(resultado.items).toEqual([{ producto: muffin, cantidad: 1 }])
+    const estadoFinal = carritoReducer(estadoInicial, accion)
+
+    expect(estadoFinal).toHaveLength(1)
+    expect(estadoFinal[0]).toEqual(producto)
+  })
+
+  it('incrementa la cantidad si el producto ya existe al agregar', () => {
+    const estadoInicial: ItemCarrito[] = [{ id: 1, nombre: 'Cafe', precio: 1000, cantidad: 1 }]
+    const producto: ItemCarrito = { id: 1, nombre: 'Cafe', precio: 1000, cantidad: 1 }
+    const accion: ActionCarrito = { type: 'AGREGAR', payload: producto }
+
+    const estadoFinal = carritoReducer(estadoInicial, accion)
+
+    expect(estadoFinal).toHaveLength(1)
+    expect(estadoFinal[0].cantidad).toBe(2)
+  })
+
+  it('resta la cantidad de un producto', () => {
+    const estadoInicial: ItemCarrito[] = [{ id: 1, nombre: 'Cafe', precio: 1000, cantidad: 2 }]
+    const accion: ActionCarrito = { type: 'RESTAR', payload: { id: 1 } }
+
+    const estadoFinal = carritoReducer(estadoInicial, accion)
+
+    expect(estadoFinal[0].cantidad).toBe(1)
+  })
+
+  it('elimina el producto si la cantidad llega a cero al restar', () => {
+    const estadoInicial: ItemCarrito[] = [{ id: 1, nombre: 'Cafe', precio: 1000, cantidad: 1 }]
+    const accion: ActionCarrito = { type: 'RESTAR', payload: { id: 1 } }
+
+    const estadoFinal = carritoReducer(estadoInicial, accion)
+
+    expect(estadoFinal).toHaveLength(0)
+  })
+
+  it('quita un producto completamente del carrito', () => {
+    const estadoInicial: ItemCarrito[] = [{ id: 1, nombre: 'Cafe', precio: 1000, cantidad: 2 }]
+    const accion: ActionCarrito = { type: 'QUITAR', payload: { id: 1 } }
+
+    const estadoFinal = carritoReducer(estadoInicial, accion)
+
+    expect(estadoFinal).toHaveLength(0)
+  })
+
+  it('vacía todo el carrito', () => {
+    const estadoInicial: ItemCarrito[] = [
+      { id: 1, nombre: 'Cafe', precio: 1000, cantidad: 1 },
+      { id: 2, nombre: 'Medialuna', precio: 500, cantidad: 2 },
+    ]
+    const accion: ActionCarrito = { type: 'VACIAR' }
+
+    const estadoFinal = carritoReducer(estadoInicial, accion)
+
+    expect(estadoFinal).toHaveLength(0)
   })
 })
-
-
-it('AGREGAR incrementa cantidad si el producto ya está', () => {
-  const estadoInicialConItem = {
-    items: [{ producto: muffin, cantidad: 1 }]
-  }
-
-  const resultado = carritoReducer(estadoInicialConItem, {
-    type: 'AGREGAR',
-    producto: muffin,
-  })
-
-  expect(resultado.items).toEqual([{ producto: muffin, cantidad: 2 }])
-})
-
-it('RESTAR decrementa la cantidad del producto', () => {
-    const estadoInicialConItem = {
-      items: [{ producto: muffin, cantidad: 2 }]
-    }
-
-    const resultado = carritoReducer(estadoInicialConItem, {
-      type: 'RESTAR',
-      productoId: muffin.id,
-    })
-
-    expect(resultado.items).toEqual([{ producto: muffin, cantidad: 1 }])
-  })
