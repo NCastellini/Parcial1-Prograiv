@@ -13,7 +13,8 @@ export type ItemCarrito = {
 type EstadoConfirmacion =
   | { estado: 'inicial' }
   | { estado: 'enviando' }
-  | { estado: 'confirmado'; pedido: Pedido };
+  | { estado: 'confirmado'; pedido: Pedido }
+  | { estado: 'error'; mensaje: string };
 
 type Props = {
   items: ItemCarrito[];
@@ -28,12 +29,36 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
   async function confirmar() {
     setEstado({ estado: 'enviando' });
 
-    const pedido = await api.crearPedido(
-      items.map((item) => ({ productoId: item.id, cantidad: item.cantidad })),
-      mesa === null ? undefined : mesa,
-    );
+    try {
+      const pedido = await api.crearPedido(
+        items.map((item) => ({ productoId: item.id, cantidad: item.cantidad })),
+        mesa === null ? undefined : mesa,
+      );
 
-    setEstado({ estado: 'confirmado', pedido });
+      setEstado({ estado: 'confirmado', pedido });
+    } catch (e) {
+      setEstado({
+        estado: 'error',
+        mensaje: e instanceof Error ? e.message : 'Error inesperado',
+      });
+    }
+  }
+
+  if (estado.estado === 'error') {
+    return (
+      <section aria-label="Error al confirmar el pedido">
+        <p className="text-danger mb-2" role="alert">
+          {estado.mensaje}
+        </p>
+        <button
+          type="button"
+          className="btn btn-success"
+          onClick={() => void confirmar()}
+        >
+          Confirmar pedido
+        </button>
+      </section>
+    );
   }
 
   if (estado.estado === 'confirmado') {
