@@ -39,4 +39,21 @@ describe('SeguimientoPedido', () => {
 
     expect(rutas[0]).toBe('/pedidos/5');
   });
+
+  it('SeguimientoPedido muestra el estado actual del pedido', async () => {
+    server.use(
+      http.get('/pedidos/:id', () =>
+        HttpResponse.json({ ...pedidoEjemplo, estado: 'en_preparacion' }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<SeguimientoPedido pedidoId={5} />);
+
+    await user.click(screen.getByRole('button', { name: /consultar estado/i }));
+
+    expect(
+      await screen.findByText(/estado: en_preparacion/i),
+    ).toBeInTheDocument();
+  });
 });
