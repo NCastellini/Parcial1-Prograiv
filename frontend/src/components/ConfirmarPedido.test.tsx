@@ -222,4 +222,33 @@ describe('ConfirmarPedido', () => {
       screen.getByRole('button', { name: /confirmar pedido/i }),
     ).toBeInTheDocument();
   });
+
+  it('error 500 al confirmar muestra mensaje con botón reintentar', async () => {
+    const pedidos: unknown[] = [];
+
+    server.use(
+      http.post('/pedidos', async ({ request }) => {
+        pedidos.push(await request.json());
+        return HttpResponse.json(
+          { error: 'Error interno del servidor' },
+          { status: 500 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText('Error interno del servidor'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /reintentar/i }));
+
+    await waitFor(() => {
+      expect(pedidos).toHaveLength(2);
+    });
+  });
 });
