@@ -50,6 +50,15 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
         <p className="text-danger mb-2" role="alert">
           {estado.mensaje}
         </p>
+        <p className="mb-1 fst-italic">Tu carrito se conservó:</p>
+        <ul className="mb-2">
+          {items.map((item) => (
+            <li key={item.id}>
+              <span>{item.nombre}</span>{' '}
+              <span className="text-muted">× {item.cantidad}</span>
+            </li>
+          ))}
+        </ul>
         <button
           type="button"
           className="btn btn-success"
