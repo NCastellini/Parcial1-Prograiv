@@ -1,6 +1,13 @@
 import { useMenu } from '../hooks/useMenu';
+import type { ReactNode } from 'react';
+import type { Producto } from '../api/schemas';
 
-export default function Menu() {
+type Props = {
+  mostrarCatalogo?: boolean;
+  children?: (productos: Producto[]) => ReactNode;
+};
+
+export default function Menu({ mostrarCatalogo = true, children }: Props) {
   const { estado, reintentar } = useMenu();
 
   if (estado.estado === 'cargando') {
@@ -20,7 +27,7 @@ export default function Menu() {
   if (estado.estado === 'listo') {
     return (
       <section aria-label="Menú">
-        <div className="row g-3">
+        {mostrarCatalogo && <div className="row g-3">
           {estado.productos.map((producto) => (
             <div className="col-12 col-md-6 col-lg-4" key={producto.id}>
               <article className="card h-100">
@@ -44,7 +51,8 @@ export default function Menu() {
               </article>
             </div>
           ))}
-        </div>
+        </div>}
+        {children?.(estado.productos)}
       </section>
     );
   }

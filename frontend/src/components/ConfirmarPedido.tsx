@@ -19,9 +19,10 @@ type EstadoConfirmacion =
 type Props = {
   items: ItemCarrito[];
   mesa: number | null;
+  onConfirmado?: (pedido: Pedido) => void;
 };
 
-export default function ConfirmarPedido({ items, mesa }: Props) {
+export default function ConfirmarPedido({ items, mesa, onConfirmado }: Props) {
   const [estado, setEstado] = useState<EstadoConfirmacion>({
     estado: 'inicial',
   });
@@ -36,6 +37,7 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
       );
 
       setEstado({ estado: 'confirmado', pedido });
+      onConfirmado?.(pedido);
     } catch (e) {
       // Los errores de red (fetch rechazado) u otros errores inesperados
       // no tienen un mensaje útil para el usuario: mostramos uno genérico.

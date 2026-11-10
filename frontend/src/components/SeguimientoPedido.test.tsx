@@ -56,4 +56,43 @@ describe('SeguimientoPedido', () => {
       await screen.findByText(/estado: en_preparacion/i),
     ).toBeInTheDocument();
   });
+
+  it('actualiza el estado al consultar otra vez sin recargar la página', async () => {
+    let consultas = 0;
+    server.use(http.get('/pedidos/:id', () => {
+      consultas++;
+      return HttpResponse.json({ ...pedidoEjemplo, estado: consultas === 1 ? 'pendiente' : 'en_preparacion' });
+    }));
+    const user = userEvent.setup();
+    render(<SeguimientoPedido pedidoId={5} />);
+    await user.click(screen.getByRole('button', { name: 'Consultar estado' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Estado: pendiente');
+    await user.click(screen.getByRole('button', { name: 'Consultar estado' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Estado: en_preparacion');
+  });
+
+  it('muestra el error de la API y permite volver a consultar', async () => {
+    let consultas = 0;
+    server.use(http.get('/pedidos/:id', () => {
+      consultas++;
+      return consultas === 1
+        ? HttpResponse.json({ error: 'Pedido no encontrado' }, { status: 404 })
+        : HttpResponse.json(pedidoEjemplo);
+    }));
+    const user = userEvent.setup();
+    render(<SeguimientoPedido pedidoId={5} />);
+    await user.click(screen.getByRole('button', { name: 'Consultar estado' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Pedido no encontrado');
+    expect(screen.getByRole('button', { name: 'Consultar estado' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Consultar estado' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Estado: pendiente');
+  });
+
+  it('muestra un mensaje genérico si la API está caída', async () => {
+    server.use(http.get('/pedidos/:id', () => HttpResponse.error()));
+    render(<SeguimientoPedido pedidoId={5} />);
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Consultar estado' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('No se pudo consultar el pedido');
+    expect(screen.getByRole('button', { name: 'Consultar estado' })).toBeEnabled();
+  });
 });
