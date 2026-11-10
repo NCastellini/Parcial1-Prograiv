@@ -22,4 +22,27 @@ test.describe('Recorrido feliz', () => {
     await expect(page.getByRole('radio', { name: /Colombia/ })).toBeVisible();
     await expect(page.getByText('Muffins de chocolate')).toBeVisible();
   });
+
+  test('elegir expreso mediano Colombia y agregar al carrito', async ({ page }) => {
+    await page.goto('/?mesa=4');
+
+    // Se arma el café por pasos: bebida, tamaño y origen.
+    await page.getByRole('radio', { name: 'Expreso', exact: true }).check();
+    await page.getByRole('radio', { name: 'Mediano', exact: true }).check();
+    await page.getByRole('radio', { name: /Colombia/ }).check();
+
+    await page.getByRole('button', { name: 'Agregar', exact: true }).click();
+
+    // El carrito muestra el producto elegido con su cantidad.
+    await expect(
+      page
+        .getByRole('listitem')
+        .filter({ hasText: 'Expreso Colombia (Mediano)' }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole('listitem')
+        .filter({ hasText: 'Expreso Colombia (Mediano)' }),
+    ).toContainText('× 1');
+  });
 });
