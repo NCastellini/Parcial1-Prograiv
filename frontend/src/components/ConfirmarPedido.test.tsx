@@ -191,4 +191,35 @@ describe('ConfirmarPedido', () => {
       await screen.findByText('El producto Muffins de chocolate no tiene stock'),
     ).toBeInTheDocument();
   });
+
+  it('error 4xx al confirmar no vacía el carrito', async () => {
+    server.use(
+      http.post('/pedidos', () =>
+        HttpResponse.json(
+          { error: 'El producto Muffins de chocolate no tiene stock' },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText('El producto Muffins de chocolate no tiene stock'),
+    ).toBeInTheDocument();
+
+    // El carrito sigue intacto: los items siguen visibles.
+    expect(
+      await screen.findByText('Expreso Colombia (Mediano)'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Muffins de chocolate')).toBeInTheDocument();
+
+    // Y se puede volver a confirmar.
+    expect(
+      screen.getByRole('button', { name: /confirmar pedido/i }),
+    ).toBeInTheDocument();
+  });
 });
