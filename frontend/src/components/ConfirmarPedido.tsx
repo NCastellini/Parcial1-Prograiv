@@ -14,7 +14,7 @@ type Props = {
   mesa: number | null;
 };
 
-export default function ConfirmarPedido({ items }: Props) {
+export default function ConfirmarPedido({ items, mesa }: Props) {
   const [enviando, setEnviando] = useState(false);
 
   async function confirmar() {
@@ -22,6 +22,7 @@ export default function ConfirmarPedido({ items }: Props) {
 
     await api.crearPedido(
       items.map((item) => ({ productoId: item.id, cantidad: item.cantidad })),
+      mesa!,
     );
 
     setEnviando(false);
