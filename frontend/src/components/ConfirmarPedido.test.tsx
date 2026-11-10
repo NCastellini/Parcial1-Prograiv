@@ -127,4 +127,24 @@ describe('ConfirmarPedido', () => {
       await screen.findByText('Pedido #7'),
     ).toBeInTheDocument();
   });
+
+  it('después de confirmar se muestra el estado del pedido', async () => {
+    server.use(
+      http.post('/pedidos', () =>
+        HttpResponse.json(
+          { id: 7, estado: 'pendiente', items: [], total: 17220, mesaID: 4 },
+          { status: 201 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText(/estado: pendiente/i),
+    ).toBeInTheDocument();
+  });
 });
