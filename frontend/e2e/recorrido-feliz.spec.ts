@@ -1,8 +1,23 @@
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // Recorrido feliz completo contra el frontend y la API reales.
 // Cada test es autónomo: el beforeEach de reset/seed deja la base
 // en estado conocido para que los pedidos sean deterministas.
+
+// Paso a paso del recorrido: arma un expreso Colombia mediano
+// y agrega un muffin de chocolate al carrito.
+async function agregarExpresoYMuffin(page: Page) {
+  await page.getByRole('radio', { name: 'Expreso', exact: true }).check();
+  await page.getByRole('radio', { name: 'Mediano', exact: true }).check();
+  await page.getByRole('radio', { name: /Colombia/ }).check();
+  await page.getByRole('button', { name: 'Agregar', exact: true }).click();
+
+  await page
+    .locator('article', { hasText: 'Muffins de chocolate' })
+    .getByRole('button', { name: 'Agregar al carrito' })
+    .click();
+}
 
 test.describe('Recorrido feliz', () => {
   test('abrir menú desde QR con ?mesa=4', async ({ page }) => {
@@ -63,5 +78,18 @@ test.describe('Recorrido feliz', () => {
     await expect(
       page.getByRole('listitem').filter({ hasText: 'Muffins de chocolate' }),
     ).toContainText('× 1');
+  });
+
+  test('confirmar pedido y verificar número, estado y total', async ({ page }) => {
+    await page.goto('/?mesa=4');
+    await agregarExpresoYMuffin(page);
+
+    await page.getByRole('button', { name: 'Confirmar pedido' }).click();
+
+    // El número, el estado y el total son los que devuelve la API.
+    await expect(page.getByText('Pedido #1')).toBeVisible();
+    await expect(page.getByText('Estado: pendiente')).toBeVisible();
+    // Expreso Colombia mediano ($7.360) + muffin ($2.500) = $9.860.
+    await expect(page.getByText('Total: $9.860')).toBeVisible();
   });
 });
