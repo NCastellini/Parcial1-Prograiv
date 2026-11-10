@@ -92,13 +92,32 @@ test.describe('Recorrido feliz', () => {
   });
 
   test('confirmar pedido y verificar número, estado y total', async ({ page }) => {
+    // Observamos el POST que el front envía a la API (sin interceptarlo).
+    const cuerpos: unknown[] = [];
+    page.on('request', (req) => {
+      if (req.method() === 'POST' && new URL(req.url()).pathname === '/pedidos') {
+        cuerpos.push(req.postDataJSON());
+      }
+    });
+
     await page.goto('/?mesa=4');
     await agregarExpresoYMuffin(page);
 
     await page.getByRole('button', { name: 'Confirmar pedido' }).click();
 
-    // El número, el estado y el total son los que devuelve la API.
+    // El body enviado incluye los items con sus ids reales y la mesa del QR.
     await expect(page.getByText('Pedido #1')).toBeVisible();
+    expect(cuerpos).toEqual([
+      {
+        items: [
+          { productoId: 2, cantidad: 1 },
+          { productoId: 7, cantidad: 1 },
+        ],
+        mesaID: 4,
+      },
+    ]);
+
+    // El número, el estado y el total son los que devuelve la API.
     await expect(page.getByText('Estado: pendiente')).toBeVisible();
     // Expreso Colombia mediano ($7.360) + muffin ($2.500) = $9.860.
     await expect(page.getByText('Total: $9.860')).toBeVisible();
