@@ -50,6 +50,17 @@ El hook utiliza una unión discriminada de tres estados:
 
 Las respuestas se validan mediante Zod antes de utilizarse.
 
+### Confirmación de pedido
+
+El componente `ConfirmarPedido` recibe los items del carrito y la mesa
+detectada en la URL, y al confirmar envía `POST /pedidos` con el body:
+
+- `items`: array de `{ productoId, cantidad }` mapeado desde el carrito.
+- `mesaID`: solo se incluye cuando hay mesa detectada (retiro en barra lo omite).
+
+Al confirmar, la vista de confirmación muestra el número de pedido, el estado
+y el total **devueltos por la API** (no valores calculados en el front).
+
 ## Contrato esperado de la API
 
 ### GET /productos
