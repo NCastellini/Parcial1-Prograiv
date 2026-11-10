@@ -171,4 +171,24 @@ describe('ConfirmarPedido', () => {
 
     expect(screen.queryByText('$17.220')).not.toBeInTheDocument();
   });
+
+  it('error 4xx al confirmar muestra el mensaje de la API', async () => {
+    server.use(
+      http.post('/pedidos', () =>
+        HttpResponse.json(
+          { error: 'El producto Muffins de chocolate no tiene stock' },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText('El producto Muffins de chocolate no tiene stock'),
+    ).toBeInTheDocument();
+  });
 });
