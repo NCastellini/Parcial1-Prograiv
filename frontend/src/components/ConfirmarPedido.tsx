@@ -22,7 +22,7 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
 
     await api.crearPedido(
       items.map((item) => ({ productoId: item.id, cantidad: item.cantidad })),
-      mesa!,
+      mesa === null ? undefined : mesa,
     );
 
     setEnviando(false);
