@@ -41,6 +41,9 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
       <section aria-label="Confirmación del pedido">
         <p className="fw-bold mb-0">Pedido #{estado.pedido.id}</p>
         <p className="mb-0">Estado: {estado.pedido.estado}</p>
+        <p className="mb-0">
+          Total: ${estado.pedido.total.toLocaleString('es-AR')}
+        </p>
       </section>
     );
   }
