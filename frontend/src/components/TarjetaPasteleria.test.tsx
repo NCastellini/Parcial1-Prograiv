@@ -1,6 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
-import { TarjetaPasteleria } from './TarjetaPasteleria.js'
+import { afterEach, describe, it, expect, vi } from 'vitest'
+import { cleanup, render, fireEvent } from '@testing-library/react'
+import { TarjetaPasteleria } from './TarjetaPasteleria'
+
+afterEach(() => {
+  cleanup()
+})
 
 const muffin = {
   id: 1,

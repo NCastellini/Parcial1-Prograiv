@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { carritoReducer, ItemCarrito, ActionCarrito } from './carritoReducer.js'
+import { carritoReducer, type ItemCarrito, type ActionCarrito } from './carritoReducer'
 
 describe('carritoReducer', () => {
   it('agrega un producto nuevo al carrito', () => {
