@@ -251,4 +251,24 @@ describe('ConfirmarPedido', () => {
       expect(pedidos).toHaveLength(2);
     });
   });
+
+  it('API caída muestra mensaje de error genérico', async () => {
+    server.use(http.post('/pedidos', () => HttpResponse.error()));
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText(
+        'No se pudo conectar con el servidor. Intentá de nuevo en unos minutos.',
+      ),
+    ).toBeInTheDocument();
+
+    // No filtramos el mensaje técnico del error de red.
+    expect(
+      screen.queryByText(/failed to fetch|fetch failed/i),
+    ).not.toBeInTheDocument();
+  });
 });
