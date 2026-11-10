@@ -148,3 +148,27 @@ Para verificar la compilación:
 ```bash
 npm run build
 ```
+
+## Pruebas E2E (Playwright)
+
+Los tests E2E cubren el recorrido feliz completo contra el **frontend y la
+API reales**, sin mocks. Corren con:
+
+```bash
+npm run test:e2e
+```
+
+Requisitos previos:
+
+1. Browsers de Playwright instalados (`npx playwright install chromium`) y
+   las dependencias de sistema correspondientes
+   (`sudo npx playwright install-deps chromium` en Linux).
+2. Nada más: la configuración levanta por sí misma la API (`NODE_ENV=test`
+   para habilitar `/__test__/reset` y `/__test__/seed`) y el frontend de
+   Vite. Si ya hay servidores corriendo en los puertos 3000 o 5173, se
+   reutilizan — pero la API debe haber arrancado con `NODE_ENV=test`,
+   si no los fixtures de reset/seed devolverán 404.
+
+Los fixtures de reset y seed dejan la base en un estado conocido antes de
+cada test, por lo que los pedidos creados son deterministas (el primero es
+siempre el #1).
