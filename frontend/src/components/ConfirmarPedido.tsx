@@ -10,6 +10,17 @@ export type ItemCarrito = {
   cantidad: number;
 };
 
+// Vista con los datos del pedido devueltos por la API.
+export function VistaConfirmacion({ pedido }: { pedido: Pedido }) {
+  return (
+    <section aria-label="Confirmación del pedido">
+      <p className="fw-bold mb-0">Pedido #{pedido.id}</p>
+      <p className="mb-0">Estado: {pedido.estado}</p>
+      <p className="mb-0">Total: ${pedido.total.toLocaleString('es-AR')}</p>
+    </section>
+  );
+}
+
 type EstadoConfirmacion =
   | { estado: 'inicial' }
   | { estado: 'enviando' }
@@ -19,9 +30,10 @@ type EstadoConfirmacion =
 type Props = {
   items: ItemCarrito[];
   mesa: number | null;
+  onConfirmado?: (pedido: Pedido) => void;
 };
 
-export default function ConfirmarPedido({ items, mesa }: Props) {
+export default function ConfirmarPedido({ items, mesa, onConfirmado }: Props) {
   const [estado, setEstado] = useState<EstadoConfirmacion>({
     estado: 'inicial',
   });
@@ -36,6 +48,7 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
       );
 
       setEstado({ estado: 'confirmado', pedido });
+      onConfirmado?.(pedido);
     } catch (e) {
       // Los errores de red (fetch rechazado) u otros errores inesperados
       // no tienen un mensaje útil para el usuario: mostramos uno genérico.
@@ -80,15 +93,7 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
   }
 
   if (estado.estado === 'confirmado') {
-    return (
-      <section aria-label="Confirmación del pedido">
-        <p className="fw-bold mb-0">Pedido #{estado.pedido.id}</p>
-        <p className="mb-0">Estado: {estado.pedido.estado}</p>
-        <p className="mb-0">
-          Total: ${estado.pedido.total.toLocaleString('es-AR')}
-        </p>
-      </section>
-    );
+    return <VistaConfirmacion pedido={estado.pedido} />;
   }
 
   return (
