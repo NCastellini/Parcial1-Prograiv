@@ -77,4 +77,34 @@ describe('ConfirmarPedido', () => {
       mesaID: 4,
     });
   });
+
+  it('POST /pedidos sin mesa envía el body sin mesaId', async () => {
+    const cuerpos: unknown[] = [];
+
+    server.use(
+      http.post('/pedidos', async ({ request }) => {
+        cuerpos.push(await request.json());
+        return HttpResponse.json(
+          { id: 3, estado: 'pendiente', items: [], total: 17220 },
+          { status: 201 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={null} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    await waitFor(() => {
+      expect(cuerpos).toHaveLength(1);
+    });
+
+    expect(cuerpos[0]).toEqual({
+      items: [
+        { productoId: 2, cantidad: 2 },
+        { productoId: 7, cantidad: 1 },
+      ],
+    });
+  });
 });
