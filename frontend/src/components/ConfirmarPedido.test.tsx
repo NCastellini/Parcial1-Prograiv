@@ -147,4 +147,28 @@ describe('ConfirmarPedido', () => {
       await screen.findByText(/estado: pendiente/i),
     ).toBeInTheDocument();
   });
+
+  it('después de confirmar se muestra el total que devolvió la API', async () => {
+    // Total distinto al que calcularía el front (7360*2 + 2500 = 17220)
+    // para verificar que se muestra el de la API y no uno calculado localmente.
+    server.use(
+      http.post('/pedidos', () =>
+        HttpResponse.json(
+          { id: 7, estado: 'pendiente', items: [], total: 19999, mesaID: 4 },
+          { status: 201 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText('Total: $19.999'),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByText('$17.220')).not.toBeInTheDocument();
+  });
 });
