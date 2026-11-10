@@ -92,4 +92,16 @@ test.describe('Recorrido feliz', () => {
     // Expreso Colombia mediano ($7.360) + muffin ($2.500) = $9.860.
     await expect(page.getByText('Total: $9.860')).toBeVisible();
   });
+
+  test('consultar seguimiento y ver estado pendiente', async ({ page }) => {
+    await page.goto('/?mesa=4');
+    await agregarExpresoYMuffin(page);
+    await page.getByRole('button', { name: 'Confirmar pedido' }).click();
+    await expect(page.getByText('Pedido #1')).toBeVisible();
+
+    // El seguimiento consulta el pedido a la API sin recargar la página.
+    await page.getByRole('button', { name: 'Consultar estado' }).click();
+
+    await expect(page.getByRole('status')).toHaveText('Estado: pendiente');
+  });
 });
