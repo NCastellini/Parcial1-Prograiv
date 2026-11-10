@@ -171,4 +171,104 @@ describe('ConfirmarPedido', () => {
 
     expect(screen.queryByText('$17.220')).not.toBeInTheDocument();
   });
+
+  it('error 4xx al confirmar muestra el mensaje de la API', async () => {
+    server.use(
+      http.post('/pedidos', () =>
+        HttpResponse.json(
+          { error: 'El producto Muffins de chocolate no tiene stock' },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText('El producto Muffins de chocolate no tiene stock'),
+    ).toBeInTheDocument();
+  });
+
+  it('error 4xx al confirmar no vacía el carrito', async () => {
+    server.use(
+      http.post('/pedidos', () =>
+        HttpResponse.json(
+          { error: 'El producto Muffins de chocolate no tiene stock' },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText('El producto Muffins de chocolate no tiene stock'),
+    ).toBeInTheDocument();
+
+    // El carrito sigue intacto: los items siguen visibles.
+    expect(
+      await screen.findByText('Expreso Colombia (Mediano)'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Muffins de chocolate')).toBeInTheDocument();
+
+    // Y se puede volver a confirmar.
+    expect(
+      screen.getByRole('button', { name: /confirmar pedido/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('error 500 al confirmar muestra mensaje con botón reintentar', async () => {
+    const pedidos: unknown[] = [];
+
+    server.use(
+      http.post('/pedidos', async ({ request }) => {
+        pedidos.push(await request.json());
+        return HttpResponse.json(
+          { error: 'Error interno del servidor' },
+          { status: 500 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText('Error interno del servidor'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /reintentar/i }));
+
+    await waitFor(() => {
+      expect(pedidos).toHaveLength(2);
+    });
+  });
+
+  it('API caída muestra mensaje de error genérico', async () => {
+    server.use(http.post('/pedidos', () => HttpResponse.error()));
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    expect(
+      await screen.findByText(
+        'No se pudo conectar con el servidor. Intentá de nuevo en unos minutos.',
+      ),
+    ).toBeInTheDocument();
+
+    // No filtramos el mensaje técnico del error de red.
+    expect(
+      screen.queryByText(/failed to fetch|fetch failed/i),
+    ).not.toBeInTheDocument();
+  });
 });
