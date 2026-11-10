@@ -37,9 +37,16 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
 
       setEstado({ estado: 'confirmado', pedido });
     } catch (e) {
+      // Los errores de red (fetch rechazado) u otros errores inesperados
+      // no tienen un mensaje útil para el usuario: mostramos uno genérico.
+      const mensaje =
+        e instanceof ApiError
+          ? e.message
+          : 'No se pudo conectar con el servidor. Intentá de nuevo en unos minutos.';
+
       setEstado({
         estado: 'error',
-        mensaje: e instanceof Error ? e.message : 'Error inesperado',
+        mensaje,
         // Un 5xx es transitorio del lado del servidor: se puede reintentar.
         reintentable: e instanceof ApiError && e.status >= 500,
       });
