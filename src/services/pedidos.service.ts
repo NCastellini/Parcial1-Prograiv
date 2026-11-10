@@ -1,5 +1,7 @@
 import type { Pedido, ItemPedido } from '../data/pedidosCafe.js';
 import { obtenerProducto } from './productos.service.js';
+import { ErrorHttp } from '../errors.js';
+import { mesas } from '../data/mesas.js';
 
 // Modelo reducido de los productos para agregarlos a los pedidos.
 export interface ItemEntrada {
@@ -16,18 +18,26 @@ export function calcularTotal(items: ItemPedido[]): number {
     return items.reduce((acc, i) => acc + i.precioUnitario * i.cantidad, 0);
 }
 
-export function crearPedido(entrada: ItemEntrada[]): Pedido {
+export function crearPedido(entrada: ItemEntrada[], mesaID?: number): Pedido {
     if (!Array.isArray(entrada) || entrada.length === 0) {
-        throw new Error('El pedido debe tener al menos un item'); // Caso de error: El pedido está vacío.
+        throw new ErrorHttp(400, 'El pedido debe tener al menos un item'); // Caso de error: El pedido está vacío.
     }
 
-    const items: ItemPedido[] = entrada.map(({ productoId, cantidad }) => {
+    if (mesaID !== undefined && !mesas.some((m) => m.id === mesaID)) {
+        throw new ErrorHttp(400, `La mesa ${mesaID} no existe`);
+    }
+
+    const items: ItemPedido[] = entrada.map((item) => {
+        if (!item || typeof item !== 'object' || !Number.isInteger(item.productoId) || item.productoId <= 0) {
+            throw new ErrorHttp(400, 'productoId debe ser un número entero positivo');
+        }
+        const { productoId, cantidad } = item;
         if (!Number.isInteger(cantidad) || cantidad <= 0) {
-            throw new Error(`Cantidad inválida para el producto ${productoId}`); // Caso de error: Se selecciona una cantidad inválida del producto.
+            throw new ErrorHttp(400, `Cantidad inválida para el producto ${productoId}`); // Caso de error: Se selecciona una cantidad inválida del producto.
         }
         const producto = obtenerProducto(productoId);
         if (!producto) {
-            throw new Error(`El producto ${productoId} no existe`); // Caso de error: Se selecciona un item con id inválido.
+            throw new ErrorHttp(404, `El producto ${productoId} no existe`); // Caso de error: Se selecciona un item con id inválido.
         }
         return { productoId, cantidad, precioUnitario: producto.calcularPrecio() };
     });
@@ -37,6 +47,7 @@ export function crearPedido(entrada: ItemEntrada[]): Pedido {
         items,
         estado: 'pendiente',
         total: calcularTotal(items),
+        ... (mesaID !== undefined && { mesaID }),
     };
     pedidos.push(pedido);
     return pedido;
