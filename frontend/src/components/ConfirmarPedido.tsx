@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { api } from '../api/client';
+import { api, ApiError } from '../api/client';
 import type { Pedido } from '../api/schemas';
 
 // Item del carrito tal como lo produce el reducer (feature/carrito).
@@ -14,7 +14,7 @@ type EstadoConfirmacion =
   | { estado: 'inicial' }
   | { estado: 'enviando' }
   | { estado: 'confirmado'; pedido: Pedido }
-  | { estado: 'error'; mensaje: string };
+  | { estado: 'error'; mensaje: string; reintentable: boolean };
 
 type Props = {
   items: ItemCarrito[];
@@ -40,6 +40,8 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
       setEstado({
         estado: 'error',
         mensaje: e instanceof Error ? e.message : 'Error inesperado',
+        // Un 5xx es transitorio del lado del servidor: se puede reintentar.
+        reintentable: e instanceof ApiError && e.status >= 500,
       });
     }
   }
@@ -64,7 +66,7 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
           className="btn btn-success"
           onClick={() => void confirmar()}
         >
-          Confirmar pedido
+          {estado.reintentable ? 'Reintentar' : 'Confirmar pedido'}
         </button>
       </section>
     );
