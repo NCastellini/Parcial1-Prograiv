@@ -40,6 +40,7 @@ export default function ConfirmarPedido({ items, mesa }: Props) {
     return (
       <section aria-label="Confirmación del pedido">
         <p className="fw-bold mb-0">Pedido #{estado.pedido.id}</p>
+        <p className="mb-0">Estado: {estado.pedido.estado}</p>
       </section>
     );
   }
