@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api/client';
+import type { Pedido } from '../api/schemas';
 
 // Item del carrito tal como lo produce el reducer (feature/carrito).
 export type ItemCarrito = {
@@ -9,30 +10,45 @@ export type ItemCarrito = {
   cantidad: number;
 };
 
+type EstadoConfirmacion =
+  | { estado: 'inicial' }
+  | { estado: 'enviando' }
+  | { estado: 'confirmado'; pedido: Pedido };
+
 type Props = {
   items: ItemCarrito[];
   mesa: number | null;
 };
 
 export default function ConfirmarPedido({ items, mesa }: Props) {
-  const [enviando, setEnviando] = useState(false);
+  const [estado, setEstado] = useState<EstadoConfirmacion>({
+    estado: 'inicial',
+  });
 
   async function confirmar() {
-    setEnviando(true);
+    setEstado({ estado: 'enviando' });
 
-    await api.crearPedido(
+    const pedido = await api.crearPedido(
       items.map((item) => ({ productoId: item.id, cantidad: item.cantidad })),
       mesa === null ? undefined : mesa,
     );
 
-    setEnviando(false);
+    setEstado({ estado: 'confirmado', pedido });
+  }
+
+  if (estado.estado === 'confirmado') {
+    return (
+      <section aria-label="Confirmación del pedido">
+        <p className="fw-bold mb-0">Pedido #{estado.pedido.id}</p>
+      </section>
+    );
   }
 
   return (
     <button
       type="button"
       className="btn btn-success"
-      disabled={enviando}
+      disabled={estado.estado === 'enviando'}
       onClick={() => void confirmar()}
     >
       Confirmar pedido
