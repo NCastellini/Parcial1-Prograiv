@@ -45,4 +45,23 @@ test.describe('Recorrido feliz', () => {
         .filter({ hasText: 'Expreso Colombia (Mediano)' }),
     ).toContainText('× 1');
   });
+
+  test('agregar muffin de chocolate al carrito', async ({ page }) => {
+    await page.goto('/?mesa=4');
+
+    // La pastelería se agrega directo desde su tarjeta.
+    const tarjetaMuffin = page.locator('article', {
+      hasText: 'Muffins de chocolate',
+    });
+    await tarjetaMuffin
+      .getByRole('button', { name: 'Agregar al carrito' })
+      .click();
+
+    await expect(
+      page.getByRole('listitem').filter({ hasText: 'Muffins de chocolate' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('listitem').filter({ hasText: 'Muffins de chocolate' }),
+    ).toContainText('× 1');
+  });
 });
