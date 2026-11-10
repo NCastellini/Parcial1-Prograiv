@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { ReportesService } from '../src/services/reportes.service';
+import { ReportesService } from '../src/services/reportes.service.js';
 
 describe('ReportesService - Tests Unitarios', () => {
 
