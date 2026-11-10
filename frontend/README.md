@@ -61,6 +61,25 @@ detectada en la URL, y al confirmar envía `POST /pedidos` con el body:
 Al confirmar, la vista de confirmación muestra el número de pedido, el estado
 y el total **devueltos por la API** (no valores calculados en el front).
 
+### Seguimiento de pedido
+
+El componente `SeguimientoPedido` consulta `GET /pedidos/:id` con el id
+recibido y muestra el estado actual, sin recargar la página.
+
+### Manejo de errores al confirmar
+
+`ConfirmarPedido` distingue tres casos al fallar `POST /pedidos`:
+
+- **Error 4xx**: muestra el mensaje que devolvió la API (por ejemplo, falta de
+  stock) y conserva el carrito con sus items, permitiendo confirmar de nuevo.
+- **Error 500**: muestra el mensaje y ofrece un botón `Reintentar` que vuelve a
+  enviar el pedido (el fallo es transitorio del lado del servidor).
+- **API caída**: muestra un mensaje genérico de conexión, sin filtrar el error
+  técnico de red al usuario.
+
+El cliente HTTP (`src/api/client.ts`) lanza `ApiError` con el código de
+estado HTTP para que los componentes puedan distinguir los casos anteriores.
+
 ## Contrato esperado de la API
 
 ### GET /productos
