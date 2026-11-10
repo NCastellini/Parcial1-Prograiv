@@ -46,4 +46,35 @@ describe('ConfirmarPedido', () => {
       { productoId: 7, cantidad: 1 },
     ]);
   });
+
+  it('al confirmar se incluye mesaId en el body del POST', async () => {
+    const cuerpos: unknown[] = [];
+
+    server.use(
+      http.post('/pedidos', async ({ request }) => {
+        cuerpos.push(await request.json());
+        return HttpResponse.json(
+          { id: 2, estado: 'pendiente', items: [], total: 14720, mesaID: 4 },
+          { status: 201 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    render(<ConfirmarPedido items={itemsCarrito} mesa={4} />);
+
+    await user.click(screen.getByRole('button', { name: /confirmar pedido/i }));
+
+    await waitFor(() => {
+      expect(cuerpos).toHaveLength(1);
+    });
+
+    expect(cuerpos[0]).toEqual({
+      items: [
+        { productoId: 2, cantidad: 2 },
+        { productoId: 7, cantidad: 1 },
+      ],
+      mesaID: 4,
+    });
+  });
 });
