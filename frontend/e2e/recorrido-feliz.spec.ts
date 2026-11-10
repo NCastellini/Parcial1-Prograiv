@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { API_URL } from '../playwright.config';
 
 // Recorrido feliz completo contra el frontend y la API reales.
 // Cada test es autónomo: el beforeEach de reset/seed deja la base
@@ -20,6 +21,16 @@ async function agregarExpresoYMuffin(page: Page) {
 }
 
 test.describe('Recorrido feliz', () => {
+  // Estado conocido antes de cada test: la base se reinicia y se siembran
+  // los productos, así los pedidos creados son siempre deterministas (#1).
+  test.beforeEach(async ({ request }) => {
+    const reset = await request.post(`${API_URL}/__test__/reset`);
+    expect(reset.ok()).toBeTruthy();
+
+    const seed = await request.post(`${API_URL}/__test__/seed`);
+    expect(seed.ok()).toBeTruthy();
+  });
+
   test('abrir menú desde QR con ?mesa=4', async ({ page }) => {
     await page.goto('/?mesa=4');
 
