@@ -26,6 +26,14 @@ test('producto inexistente en pedido responde 404 con { "error": "..." }', async
 });
 
 describe('Body inválido', () => {
+    test.each([null, {}, { productoId: '1', cantidad: 1 }, { productoId: 1.5, cantidad: 1 }])(
+        'un item inválido %j responde 400', async (item) => {
+            const res = await request(app).post('/pedidos').send({ items: [item] });
+            expect(res.status).toBe(400);
+            expect(res.body).toEqual({ error: expect.any(String) });
+        },
+    );
+
     test('JSON malformado responde 400 con { "error": "..." }', async () => {
         const res = await request(app)
             .post('/pedidos')

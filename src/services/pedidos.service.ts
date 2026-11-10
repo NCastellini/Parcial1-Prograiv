@@ -27,7 +27,11 @@ export function crearPedido(entrada: ItemEntrada[], mesaID?: number): Pedido {
         throw new ErrorHttp(400, `La mesa ${mesaID} no existe`);
     }
 
-    const items: ItemPedido[] = entrada.map(({ productoId, cantidad }) => {
+    const items: ItemPedido[] = entrada.map((item) => {
+        if (!item || typeof item !== 'object' || !Number.isInteger(item.productoId) || item.productoId <= 0) {
+            throw new ErrorHttp(400, 'productoId debe ser un número entero positivo');
+        }
+        const { productoId, cantidad } = item;
         if (!Number.isInteger(cantidad) || cantidad <= 0) {
             throw new ErrorHttp(400, `Cantidad inválida para el producto ${productoId}`); // Caso de error: Se selecciona una cantidad inválida del producto.
         }
